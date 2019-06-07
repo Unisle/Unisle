@@ -35,3 +35,33 @@ boby {
 .home-inner {
   background-image: url(../img/bg_spring1.JPG);
 }
+.home-inner::before{
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.5);
+}
+.caption {
+  width: 100%;
+  max-width: 100%;
+  position: absolute;
+  top: 38%;
+  z-index: 1;
+  color: white;
+}
+.caption h1 {
+  font-size: 3.8rem;
+  font-weight: 700;
+  letter-spacing: .3rem;
+  text-shadow: .1rem .1rem .8rem black;
+  padding-bottom: 1rem;
+}
+.btn-lg {
+  border-width: medium;
+  border-radius: 0;
+  padding: .6rem;
+  font-size: 1.1rem;
+}
