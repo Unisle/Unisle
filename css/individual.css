@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+body {
+  font-family: 'Montserrat', sans-serif;
+  color: black;
+}
+.jumbotron {
+  padding: 2% 4%;
+}
+.container-fluid {
+  padding-left: 8%;
+  padding-right: 8%;
+}
+.card {
+  margin: 2%;
+}
