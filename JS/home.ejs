@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>[firebase] my-sample-project</title>
+
+</head>
+
+<body>
+  <div>
+    <p>Make a Group</p>
+    <p>Group Name</p>
+    <input type="text" id="Groupname" />
+    <button onclick="makeGroup()">make a Group</button>
+  </div>
+  <input type="text" id="name">
+  <button onclick="writeUserData()">send</button>
+  <div>Your Data</div>
+  <p>--------------------------</p>
+  <button onclick="read()">read</button>
+  <p>NAME</p>
+  <div id="Uname"></div>
+  <p>UID</p>
+  <div id="uid"></div>
+  <div>
+    <p>PUT YOUR NAME</p>
+    <input type="text" id="slackNAME" />
+    <button id="update">send to slak</button>
+  </div>
+
+  <div>
+    <p>PUT MESSAGE</p>
+    <input type="text" id="message" />
+    <button onclick="PostMyPost()">send message</button>
+  </div>
+
+  <div>
+    <p>PUT Profile</p>
+    <p>username</p>
+    <input type="text" id="username" />
+    <p>pic URL</p>
+    <input type="text" id="pic" />
+    <button onclick="postMyProfile()">send profile</button>
+  </div>
+
+  <div>
+    <p>MAKE A PROJECT</p>
+    <p>TITLE</p>
+    <input type="text" id="ProjectTitle" />
+    <p>CONTENT MESSAGE</p>
+    <input type="text" id="ProjectContent" />
+    <p>RECRUIT MESSAGE</p>
+    <input type="text" id="ProjectRecruit" />
+    <p>DENSITY</p>
+    <input type="text" id="ProjectDensity" />
+    <p>PERIOD</p>
+    <input type="text" id="ProjectPeriod" />
+    <button onclick="MakeProject()">make a Project</button>
+  </div>
+
+  <div>
+    <iframe
+      src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=1&amp;bgcolor=%23A79B8E&amp;ctz=Asia%2FTokyo&amp;src=cWdhczl2Z29sZmprMXRxcDAyZWxqZzhoZWtAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;src=amEuamFwYW5lc2UjaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&amp;color=%23F09300&amp;color=%230B8043"
+      style="border:solid 1px #777" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+  </div>
+  <!-- Firebase App is always required and must be first -->
+  <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-app.js"></script>
+
+  <!-- Add additional services that you want to use -->
+  <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-functions.js"></script>
+  <!--Jquery-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script>
+    // Firebaseの初期化
+    var config = {
+      apiKey: "AIzaSyB91yPNhjOREC8S8RXEAoUaZa1gsj7s0MY",
+      authDomain: "unisle-dbba5.firebaseapp.com",
+      databaseURL: "https://unisle-dbba5.firebaseio.com",
+    };
+    firebase.initializeApp(config);
+
+    database = firebase.database();
+
+    function writeUserData() {
+      const userid = firebase.auth().currentUser.uid;
+      var Ref = database.ref('Account/' + userid + '/profile');
+      var name = document.getElementById('name').value;
+      Ref.set({
+        username: name,
+        uid: userid
+      });
+      read();
+
+    }
+
+
+    function load() {
+      var Uid = sessionStorage.getItem('key');
+      var Ref = database.ref('Account/' + Uid + '/profile');
+      Ref.on('value', function (snapshot) {
+        Uname.innerHTML = snapshot.val().username;
+        uid.innerHTML = snapshot.val().uid;
+      });
+    }
+
+    function read() {
+      var uname;
+      var uid;
+      const userid = firebase.auth().currentUser.uid;
+      var Ref = database.ref('Account/' + userid + '/profile');
+      Ref.on('value', function (snapshot) {
+        uname = snapshot.val().username;
+        uid = snapshot.val().uid;
+      });
+      uname.innerHTML = uname;
+      uid.innerHTML = uid;
+    }
+    document.addEventListener('DOMContentLoaded', load)
+
+    function handlePid() {
+      const userid = firebase.auth().currentUser.uid;
+      var Ref = database.ref('Account/' + userid + '/profile');
+      var pid;
+
+      Ref.on('value', function (snapshot) {
+        pid = snapshot.val().pid;
+      });
+
+      if (pid != null) {
+        return pid;
+      } else {
+        pid = database.ref('Profile/').push().key;
+        return pid;
+      }
+    }
+
+    function postMyProfile() {
+      const userid = firebase.auth().currentUser.uid;
+      var groupkey = handleGroup('getCurrent');
+      var Ref = database.ref('Account/' + userid + '/profile');
+      var username = document.getElementById('username').value; //ID = username
+      var pic = document.getElementById('pic').value;  //ID = pic
+      var pid = handlePid();
+
+      Ref.update({
+        username: username,
+        uid: userid,
+        pic: pic,
+        pid: pid
+      });
+
+      Ref = database.ref('Profile/' + pid);
+      Ref.update({
+        username: username,
+        pic: pic
+      });
+
+      Ref = database.ref('Group/' + groupkey + '/profile/' + pid);
+      Ref.update({
+        username: username,
+        pic: pic
+      });
+    }
+
+    //Post MyPost
+    function PostMyPost() {
+      const userid = firebase.auth().currentUser.uid;
+      var Ref = database.ref('Account/' + userid + '/profile');
+      var username;
+      var message = document.getElementById('message').value;  //ID = message
+      var date = Today();
+      var key = database.ref('Account/' + userid + '/info/post/').push().key;
+
+      Ref.on('value', function (snapshot) {
+        username = snapshot.val().username;
+      });
+
+      Ref = database.ref('Account/' + userid + '/info/post/' + key);
+      Ref.update({
+        username: username,
+        message: message,
+        date: date,
+        key: key
+      });
+      postPost(username, message, date);
+    }
+
+    function postPost(username, message, date) {
+      const database = firebase.database();
+      var groupkey = handleGroup('getCurrent');
+      var pid = handlePid();
+      var key = database.ref('Group/' + groupkey + '/profile/' + pid + '/post/').push().key;
+      var Ref = database.ref('Group/' + groupkey + '/profile/' + pid + '/post/' + key);
+      Ref.update({
+        username: username,
+        message: message,
+        date: date
+      });
+    }
+
+    //get today data String
+    function Today() {
+      var dt = new Date();
+      //年
+      var year = dt.getFullYear();
+      //月
+      //1月が0、12月が11。そのため+1をする。
+      var month = dt.getMonth() + 1;
+      //日
+      var date = dt.getDate();
+      //曜日
+      //日曜が0、土曜日が6。配列を使い曜日に変換する。
+      dateT = ["日", "月", "火", "水", "木", "金", "土"];
+      var day = dateT[dt.getDay()];
+      //時
+      var hours = dt.getHours();
+      //分
+      var minutes = dt.getMinutes();
+      //秒
+      var seconds = dt.getSeconds();
+
+      var ToDate = String(year) + " " + String(month) + " " + String(date)
+        + " (" + String(day) + ") " + String(hours) + ":" + String(minutes)
+        + ":" + String(seconds);
+
+      return ToDate;
+    }
+
+    //Post Project
+    function MakeProject() {
+      const userid = firebase.auth().currentUser.uid;
+      var groupkey = handleGroup('getCurrent');
+      var Ref = database.ref('Account/' + userid + '/profile');
+
+      var title = document.getElementById('ProjectTitle').value;  //ID = ProjectTitle
+      var contents_message = document.getElementById('ProjectContent').value;  //ID = ProjectContent
+      var recruit_message = document.getElementById('ProjectRecruit').value;  //ID = ProjectRecruit
+      var period = document.getElementById('ProjectPeriod').value;  //ID = ProjectPeriod
+      var density_message = document.getElementById('ProjectDensity').value;  //ID = ProjectDensity
+
+      var date = Today();
+      var pid = handlePid();
+      var projectkey = database.ref('Project/').push().key;
+
+      var tmpkey = database.ref('Group/' + groupkey + '/Account/' + userid + '/info/project/').push().key;
+      Ref = database.ref('Account/' + userid + '/info/project/' + tmpkey);
+
+      Ref.update({
+        projectkey: projectkey,
+        selfkey: tmpkey
+      });
+
+      Ref = database.ref('Group/' + groupkey + '/profile/' + pid + '/project/' + tmpkey);
+
+      Ref.update({
+        projectkey: projectkey,
+        selfkey: tmpkey
+      });
+
+      Ref = database.ref('Group/' + groupkey + '/project/' + projectkey);
+
+      Ref.update({
+        key: projectkey,
+        title: title,
+        startdate: date,
+        member: pid,
+        content: contents_message,
+        recruit: recruit_message,
+        period: period,
+        density: density_message
+      });
+    }
+
+    function makeGroup() {
+      const userid = firebase.auth().currentUser.uid;
+      var groupname = document.getElementById('Groupname').value;  //ID = Groupname
+      var groupkey = database.ref('Group/').push().key;
+      var tmpchildkey = database.ref('Account/' + userid + '/profile/group').push().key;
+
+      database.ref('Group/' + groupkey).update({
+        groupname: groupname,
+        groupkey: groupkey
+      });
+
+      database.ref('Account/' + userid + '/profile/group/' + tmpchildkey).update({
+        groupname: groupname,
+        groupkey: groupkey,
+        selfkey: tmpchildkey
+      });
+
+      database.ref('Account/' + userid + '/profile/currentgroup').update({
+        groupkey: groupkey
+      });
+    }
+
+    function handleGroup(mode) {
+      const userid = sessionStorage.getItem('key');
+      var groupList = [];
+      var currentgroup;
+
+      if (mode == 'getListName') {
+        database.ref('Account/' + userid + '/profile/group/').on('child_added', function (snapshot) {
+          groupList.push(snapshot.val().groupname);
+        });
+        return groupList;
+      }
+      else if (mode == 'getList') {
+        database.ref('Account/' + userid + '/profile/group/').on('child_added', function (snapshot) {
+          groupList.push(snapshot.val().groupkey);
+        });
+        return groupList;
+      }
+      else if (mode == 'getCurrent') {
+        database.ref('Account/' + userid + '/profile/currentgroup').on('value', function (snapshot) {
+          currentgroup = snapshot.val().groupkey;
+        });
+        return currentgroup;
+      }
+      else if (mode == 'setCurrent') {
+        database.ref('Account/' + userid + '/profile/group/').on('child_added', function (snapshot) {
+          groupList.push(snapshot.val().groupkey);
+        });
+        var i = document.getElementById('groupnum').value;
+        database.ref('Account/' + userid + '/profile/currentgroup').update({
+          currentgroup: groupList[i]
+        });
+      }
+    }
+
+
+  </script>
+  <script>
+    $(document).ready(function () {
+      $("#update").on('click', function () {
+        alert("SEND TO SLACK");
+        var text = 'TESTED BY ' + $("#slackNAME").val();
+        $.ajax({
+          url: 'https://slack.com/api/chat.postMessage',
+          type: 'POST',
+          data: {
+            'token': 'xoxb-362603846448-648165628695-7hInrh0c1Fc3KuN5oJGJZIxg',
+            'channel': 'CAP5X2CKD',
+            'text': text
+          }
+        })
+          // Ajaxリクエストが成功した時発動
+          .done((data) => {
+            $('.result').html(data);
+            console.log(data);
+          })
+          // Ajaxリクエストが失敗した時発動
+          .fail((data) => {
+            $('.result').html(data);
+            console.log(data);
+          })
+          // Ajaxリクエストが成功・失敗どちらでも発動
+          .always((data) => {
+
+          });
+
+      });
+    })
+
+  </script>
+</body>
+
+</html>

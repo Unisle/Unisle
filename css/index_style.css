@@ -1,59 +1,74 @@
 boby {
-  overflow-x: hidden;
-  font-family: sans-serif;
-  color: #505962;
+    overflow-x: hidden;
+    font-family: sans-serif;
+    color: #505962;
 }
 
+
 /*--- Navigation --*/
+
 .navbar {
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: .9rem;
-  letter-spacing: .1rem;
-  background: rgba(0, 0, 0, 0.7)!important;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: .9rem;
+    letter-spacing: .1rem;
+    background: rgba(0, 0, 0, 0.7)!important;
 }
+
 .navbar-brand {
-  padding: 0;
+    padding: 0;
 }
+
 .navbar-brand img {
-  height: 2.5rem;
+    height: 2.5rem;
 }
+
 .navbar-nav li {
-  padding-right: .3rem;
+    padding-right: .3rem;
 }
+
 .navbar-dark .navbar-nav .nav-link {
-  color: white;
-  padding-top: .8rem;
+    color: white;
+    padding-top: .8rem;
 }
 
 .navbar-dark .navbar-nav .nav-link.active,
 .navbar-dark .navbar-nav .nav-link:hover {
-  color: #1ebba3;
+    color: #1ebba3;
 }
 
+
 /*--- Landing Page --*/
+
 .home-inner {
-  background-image: url(../img/bg_spring1.JPG);
+    background-image: url(../img/bg_spring1.JPG);
 }
 
 .caption {
-  width: 100%;
-  max-width: 100%;
-  position: absolute;
-  top: 38%;
-  z-index: 1;
-  color: white;
+    width: 100%;
+    max-width: 100%;
+    position: absolute;
+    top: 38%;
+    z-index: 1;
+    color: white;
 }
+
 .caption h1 {
-  font-size: 3.8rem;
-  font-weight: 500;
-  letter-spacing: .3rem;
-  text-shadow: .1rem .1rem .8rem black;
-  padding-bottom: 1rem;
+    font-size: 3.8rem;
+    font-weight: 500;
+    letter-spacing: .3rem;
+    text-shadow: .1rem .1rem .8rem black;
+    padding-bottom: 1rem;
 }
+
 .btn-lg {
-  border-width: medium;
-  border-radius: 0;
-  padding: .6rem;
-  font-size: 1.1rem;
+    border-width: medium;
+    border-radius: 0;
+    padding: .6rem;
+    font-size: 1.1rem;
 }
+
+
+/*Activety*/
+
+.card img {}

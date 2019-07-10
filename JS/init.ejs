@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>TESTサイトだよ</title>
+</head>
+
+<body>
+    <p>何番目のグループにいきますか？？</p>
+    <button onclick="a()">show groups</button>
+    <div>
+        <input type="text" id="groupnum" />
+        <button onclick="handleGroup('setCurrent')">set group</button>
+    </div>
+    <div id="body">
+    </div>
+
+    <p>グループをつくりますか？？</p>
+    <input type="text" id="Groupname" />
+    <button onclick="makeGroup()">set group</button>
+
+    <a href="/home">行き先を決めたら押してください！</a>
+
+
+
+    <!-- Firebase App is always required and must be first -->
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-app.js"></script>
+
+    <!-- Add additional services that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-functions.js"></script>
+    <!--Jquery-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+    <script>
+        // Firebaseの初期化
+        var config = {
+            apiKey: "AIzaSyB91yPNhjOREC8S8RXEAoUaZa1gsj7s0MY",
+            authDomain: "unisle-dbba5.firebaseapp.com",
+            databaseURL: "https://unisle-dbba5.firebaseio.com",
+        };
+        firebase.initializeApp(config);
+
+        database = firebase.database();
+
+        function handleGroup(mode) {
+            const userid = sessionStorage.getItem('key');
+            var groupList = [];
+            var currentgroup;
+
+            if (mode == 'getList') {
+                database.ref('Account/' + userid + '/profile/group/').on('child_added', function (snapshot) {
+                    groupList.push(snapshot.val().groupname);
+                });
+                return groupList;
+            }
+            else if (mode == 'getCurrent') {
+                database.ref('Account/' + userid + '/profile/currentgroup').on('value', function (snapshot) {
+                    currentgroup = snapshot.val().groupkey;
+                });
+                return currentgroup;
+            }
+            else if (mode == 'setCurrent') {
+                database.ref('Account/' + userid + '/profile/group/').on('child_added', function (snapshot) {
+                    groupList.push(snapshot.val().groupkey);
+                });
+                var i = document.getElementById('groupnum').value;
+                database.ref('Account/' + userid + '/profile/currentgroup').update({
+                    currentgroup: groupList[i]
+                });
+            }
+        }
+
+
+        function a() {
+            var table = $("<table>")
+            var tbody = $("<tbody>")
+            var list = handleGroup('getList');
+            $("#body").empty();
+            for (let i = 0; i < list.length; i++) {
+                var text = list[i];
+                tbody.append("<tr><td>" + i + "番目：" + text + "</td></tr>")
+                table.append(tbody);
+
+                $("#body").append(table);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', a)
+
+        function makeGroup() {
+            const userid = firebase.auth().currentUser.uid;
+            var groupname = document.getElementById('Groupname').value;  //ID = Groupname
+            var groupkey = database.ref('Group/').push().key;
+            var tmpchildkey = database.ref('Account/' + userid + '/profile/group').push().key;
+
+            database.ref('Group/' + groupkey).update({
+                groupname: groupname,
+                groupkey: groupkey
+            });
+
+            database.ref('Account/' + userid + '/profile/group/' + tmpchildkey).update({
+                groupname: groupname,
+                groupkey: groupkey,
+                selfkey: tmpchildkey
+            });
+
+            database.ref('Account/' + userid + '/profile/currentgroup').update({
+                groupkey: groupkey
+            });
+        }
+
+    </script>
+</body>
+
+</html>
