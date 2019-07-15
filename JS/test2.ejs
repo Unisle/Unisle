@@ -32,6 +32,8 @@
 
     <script>
         //////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
+        //必要なグローバル変数を生成する
         const uid = sessionStorage.getItem('uid')
         let mypid
         let MYPID = database.ref('Account/' + uid + '/profile/')
@@ -44,7 +46,9 @@
         T.on('value', function (snapshot) {
             currentGroupKey = snapshot.val().groupkey
         })
-        /////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
+
         Today = function () {
             var dt = new Date();
             //年
@@ -74,7 +78,6 @@
 
         class AccountNetwork {
             constructor() {
-
             }
 
             setProfile(name, pic) {
@@ -99,14 +102,15 @@
             }
 
             isLogin() {
+                //Loginしているかどうかに加えてpidが生成されていない初期状態に必要な処理
                 if (uid == undefined) return false
                 else {
                     if (mypid == undefined) {
                         //First time only fired. 初期化時の処理
                         let tmpname = 'nanashi'
                         let defaultpic = 0
+                        //pid生成
                         let mypid = database.ref('Profile/').push().key
-
                         let Ref = database.ref('Account/' + uid + '/profile')
                         Ref.update({
                             username: tmpname,
@@ -122,32 +126,17 @@
                             pid: mypid,
                             attendance: false
                         })
+                        //初期状態を確保することで読み取りからの書き込みを可能にする
                         Ref = database.ref('Account/' + uid + '/group/')
                         Ref.update({
                             groups: ','
                         })
-
+                        //初期状態を確保することで読み取りからの書き込みを可能にする
                         Ref = database.ref('Account/' + uid + '/project')
                         Ref.update({
                             projects: ","
                         })
                     }
-                    /*
-                                        if (currentGroupKey != undefined) {
-                                            Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid)
-                                            Ref.update({
-                                                username: tmpname,
-                                                pic: defaultpic,
-                                                pid: mypid,
-                                                attendance: false
-                                            })
-                    
-                                            Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
-                                            Ref.update({
-                                                projects: ","
-                                            })
-                                        }
-                    */
                     return true
                 }
             }
@@ -160,7 +149,6 @@
             }
 
             createProject(title, content, recruit, period, density) {
-                //alert('create project')
                 //List contains title, content_message, recruit_message, period, density_message, member
                 //member is pid Array, othres is String
                 let date = Today()
@@ -168,21 +156,26 @@
                 let Ref = database.ref('Account/' + uid + '/project')
                 let projects
                 let member
+                //Account/uid/projectsからprojects(一覧)を取り出す。それに乗じてすべての処理を行う
                 Ref.once('value').then(function (snapshot) {
                     projects = snapshot.val().projects
+                    //projects(一覧)を取り出す
                     if (projects === undefined) projects = projectkey + ','
                     else projects += projectkey + ','
-
+                    //新しく作成したprojectを追加して自分の一覧に書き戻す
                     Ref.update({
                         projects: projects
                     })
-
+                    //Group/key/projectからproject_list(グループにあるすべてのプロジェクトの一覧)を取り出す
+                    //それに乗じてグループ内における自分の参加しているプロジェクト一覧を書きこむ
                     Ref = database.ref('Group/' + currentGroupKey + '/project')
                     Ref.once('value').then(function (snapshot) {
                         let tmp = snapshot.val().project_list
                         if (tmp != undefined) {
+                            //project_listが空じゃないとき
                             let list = tmp
                             list += projectkey + ','
+                            //新しく作成したプロジェクトを一覧に書き込む
                             Ref = database.ref('Group/' + currentGroupKey + '/project')
                             Ref.update({
                                 project_list: list
@@ -190,6 +183,7 @@
                             let p = ''
                             let lists = list.split(',')
                             let projectlists = projects.split(',')
+                            //自分の参加しているすべてのグループのプロジェクトのなかで、現在のグループの中に存在しているプロジェクトを取り出す
                             for (let a of lists) {
                                 for (let b of projectlists) {
                                     if (a === b) {
@@ -197,12 +191,14 @@
                                     }
                                 }
                             }
+                            //今のグループに存在するプロジェクトで自分の参加しているプロジェクトを書き込む
                             Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
                             Ref.update({
                                 projects: p
                             })
                         }
                         else {
+                            //project_listが存在しない初期のグループにおいて
                             Ref = database.ref('Group/' + currentGroupKey + '/project')
                             Ref.update({
                                 project_list: projectkey + ','
@@ -213,7 +209,7 @@
                             })
                         }
                     })
-
+                    //参加しているメンバーリストに自分のpidを追加して返す
                     Ref = database.ref('Group/' + currentGroupKey + '/project/' + projectkey)
                     Ref.once('value').then(function (snapshot) {
                         member = snapshot.val().member
@@ -233,6 +229,26 @@
                 })
             }
 
+            joinProject(key) {
+                //uid直下、currentGroup/mypid直下の参加project一覧に追加
+                //projectのmemberにmypid追加
+            }
+
+            getoutProject(key) {
+                //uid直下、currentGroup/mypid直下の参加project一覧から削除
+                //projectのmemberにmypidを削除
+            }
+
+            deleteProject(key) {
+                //uid直下、currentGroup/mypid直下の参加project一覧から削除
+                //projectのrefを削除する
+            }
+
+            deleteNotExistProject() {
+                //projectはグループで共有されるためpeerが削除したProjectが存在しないことが判明したら
+                //自分のproject一覧からそれを削除する必要がある
+            }
+
         }
 
         class PostNetwork {
@@ -241,7 +257,7 @@
             }
 
             setPost(message) {
-                alert('set post')
+                //alert('set post')
                 let date = Today()
                 let key = database.ref('Account/' + uid + '/post/').push().key
                 let Ref = database.ref('Account/' + uid + '/post/' + key)
@@ -258,10 +274,34 @@
                 Ref.update({
                     message: message,
                     date: date,
-                    selfkey: key
+                    selfkey: key,
+                    owner: mypid
                 })
             }
 
+            deletePost(key) {
+                database.ref('Account/' + uid + '/post/' + key).remove()
+                database.ref('Group/' + currentGroupKey + '/post/' + key).remove()
+            }
+
+            getPost() {
+                let post = []
+                let Ref = database.ref('Group/' + currentGroupKey + '/post').orderByChild('owner').equalTo(mypid)
+                Ref.on('child_added', function (snapshot) {
+                    let tmp = []
+                    tmp.message = snapshot.val().message
+                    tmp.date = snapshot.val().date
+                    tmp.selfkey = snapshot.val().selfkey
+                    tmp.owner = snapshot.val().owner
+                    post.push(tmp)
+                    Ref.off(snapshot.val())
+                })
+                let contentBlock = document.getElementById('body')
+                for (let p of post) {
+                    contentBlock.insertAdjacentHTML('afterbegin', p.owner + ' on ' + p.date + '$')
+                }
+                return post
+            }
         }
 
         class GroupNetwork {
@@ -298,6 +338,7 @@
             }
 
             joinGroup(groupkey) {
+                //まだ完成していない
                 //groupkey is String
                 let Ref = database.ref('Account/' + uid + '/group').once('value', function (snapshot) {
                     let groups = []
@@ -330,6 +371,7 @@
         }
 
         class Network {
+            //Networkすべてを扱うクラス
             constructor() {
             }
 
@@ -355,10 +397,11 @@
         }
 
         class Factory {
+            //MyAccount, PeerAccountを生成する工場クラス
             constructor() {
                 this.NetworkClass = new Network()
                 this.NetworkClass.create()
-                this.network = this.NetworkClass.getNetworks()
+                this.network = this.NetworkClass.getNetworks()//network Classすべてを含む
             }
 
             create() {
@@ -421,6 +464,11 @@
                                                ">make a Project</button>
 
         <button onclick="Account.isLogin()">IS LOGIN</button>
+
+        <div>
+            <div id="body"></div>
+            <button onclick="Post.getPost()">get post</button>
+        </div>
         <script>
             //document.addEventListener('DOMContentLoaded', Account.isLogin)
         </script>
