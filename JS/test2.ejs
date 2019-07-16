@@ -232,16 +232,114 @@
             joinProject(key) {
                 //uid直下、currentGroup/mypid直下の参加project一覧に追加
                 //projectのmemberにmypid追加
+                let Ref = database.ref('Account/' + uid + '/project')
+                Ref.once('value').then(function (snapshot) {
+                    let projects = snapshot.val().projects
+                    let list = projects.split(',')
+                    let joined = false
+                    for (let li of list) {
+                        if (li === key) joined = true
+                    }
+                    if (joined != true) {
+                        Ref = database.ref('Account/' + uid + '/project')
+                        Ref.update({
+                            projects: projects + key + ','
+                        })
+                        Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
+                        Ref.once('value').then(function (snapshot) {
+                            projects = snapshot.val().projects
+                        })
+                        Ref.update({
+                            projects: projects + key + ','
+                        })
+                        Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
+                        Ref.once('value').then(function (snapshot) {
+                            let member = snapshot.val().member
+                            member += mypid + ','
+                            Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
+                            Ref.update({
+                                member: member
+                            })
+                        })
+                    } else alert("既に参加しています")
+                })
+
             }
 
             getoutProject(key) {
                 //uid直下、currentGroup/mypid直下の参加project一覧から削除
                 //projectのmemberにmypidを削除
+                let Ref = database.ref('Account/' + uid + '/project')
+                Ref.once('value').then(function (snapshot) {
+                    let projects = snapshot.val().projects
+                    let list = projects.split(',')
+                    let _list = ''
+                    let joined = false
+                    for (let li of list) {
+                        if (li === key)
+                            joined = true
+                        else
+                            _list += li + ','
+                    }
+                    if (joined != false) {
+                        Ref = database.ref('Account/' + uid + '/project')
+                        Ref.update({
+                            projects: _list
+                        })
+                        Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
+                        Ref.once('value').then(function (snapshot) {
+                            projects = snapshot.val().projects
+                        })
+                        list = []
+                        _list = ''
+                        list = projects.split(',')
+                        for (let li of list) {
+                            if (li !== key)
+                                _list += li + ','
+                        }
+                        Ref.update({
+                            projects: _list
+                        })
+
+                        Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
+                        Ref.once('value').then(function (snapshot) {
+                            let member = snapshot.val().member
+                            list = []
+                            list = member.split(',')
+                            _list = ''
+                            for (let li of list) {
+                                if (li !== mypid)
+                                    _list += li + ','
+                            }
+                            Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
+                            Ref.update({
+                                member: _list
+                            })
+                        })
+                    } else alert("参加していません")
+                })
             }
 
             deleteProject(key) {
                 //uid直下、currentGroup/mypid直下の参加project一覧から削除
                 //projectのrefを削除する
+                //projectのproject_listから削除するprojectのkeyを取り除いて返す
+                getoutProject(key)
+                let Ref = database.ref('Group/' + currentGroupKey + '/project' + key)
+                Ref.remove()
+                Ref = database.ref('Group/' + currentGroupKey + '/project/')
+                Ref.once('value').then(function (snapshot) {
+                    let project_list = snapshot.val().project_list
+                    let list = project_list.split(',')
+                    let _list = ''
+                    for (let li of list) {
+                        if (li !== key) _list += li + ','
+                    }
+                    Ref = database.ref('Group/' + currentGroupKey + '/project')
+                    Ref.update({
+                        project_list: _list
+                    })
+                })
             }
 
             deleteNotExistProject() {
