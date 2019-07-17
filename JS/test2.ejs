@@ -148,7 +148,7 @@
 
             }
 
-            createProject(title, content, recruit, period, density) {
+            create(title, content, recruit, period, density) {
                 //List contains title, content_message, recruit_message, period, density_message, member
                 //member is pid Array, othres is String
                 let date = Today()
@@ -229,7 +229,7 @@
                 })
             }
 
-            joinProject(key) {
+            join(key) {
                 //uid直下、currentGroup/mypid直下の参加project一覧に追加
                 //projectのmemberにmypid追加
                 let Ref = database.ref('Account/' + uid + '/project')
@@ -266,7 +266,7 @@
 
             }
 
-            getoutProject(key) {
+            getout(key) {
                 //uid直下、currentGroup/mypid直下の参加project一覧から削除
                 //projectのmemberにmypidを削除
                 let Ref = database.ref('Account/' + uid + '/project')
@@ -320,11 +320,11 @@
                 })
             }
 
-            deleteProject(key) {
+            delete(key) {
                 //uid直下、currentGroup/mypid直下の参加project一覧から削除
                 //projectのrefを削除する
                 //projectのproject_listから削除するprojectのkeyを取り除いて返す
-                getoutProject(key)
+                getout(key)
                 let Ref = database.ref('Group/' + currentGroupKey + '/project' + key)
                 Ref.remove()
                 Ref = database.ref('Group/' + currentGroupKey + '/project/')
@@ -342,9 +342,30 @@
                 })
             }
 
-            deleteNotExistProject() {
+            update() {
                 //projectはグループで共有されるためpeerが削除したProjectが存在しないことが判明したら
                 //自分のproject一覧からそれを削除する必要がある
+                //Group直下の自分のproject一覧と全体のproject一覧を比較
+                Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
+                Ref.once('value').then(function (snapshot) {
+                    let projects = snapshot.val().projects
+                    let mylist = projects.split(',')
+                    Ref = database.ref('Group/' + currentGroupKey + '/project')
+                    Ref.once('value').then(function (snapshot) {
+                        let alllist = snapshot.val().project_list
+                        let alist = alllist.split(',')
+                        let list = ''
+                        for (let m of mylist) {
+                            for (let a of alist) {
+                                if (m == a) list += a + ','
+                            }
+                        }
+                        Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
+                        Ref.update({
+                            projects: list
+                        })
+                    })
+                })
             }
 
         }
@@ -554,7 +575,7 @@
         <input type="text" id="ProjectPeriod" />
         <script>
         </script>
-        <button onclick="Project.createProject((document.getElementById('ProjectTitle').value),
+        <button onclick="Project.create((document.getElementById('ProjectTitle').value),
                                                (document.getElementById('ProjectContent').value),
                                                (document.getElementById('ProjectRecruit').value),
                                                (document.getElementById('ProjectDensity').value),
