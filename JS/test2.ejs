@@ -34,22 +34,19 @@
         //////////////////////////////////////////////////////
         //////////////////////////////////////////////////////
         //必要なグローバル変数を生成する
-        const uid = sessionStorage.getItem('uid')
-        let mypid
-        let MYPID = database.ref('Account/' + uid + '/profile/')
-        MYPID.on('value', function (snapshot) {
+        const uid = sessionStorage.getItem('uid')//自分のuserID
+        let mypid//自分のpeerID
+        database.ref('Account/' + uid + '/profile/').on('value', function (snapshot) {
             mypid = snapshot.val().pid
         })
-
-        let currentGroupKey
-        let T = database.ref('Account/' + uid + '/profile/currentgroup')
-        T.on('value', function (snapshot) {
+        let currentGroupKey//現在のGroupKey
+        database.ref('Account/' + uid + '/profile/currentgroup').on('value', function (snapshot) {
             currentGroupKey = snapshot.val().groupkey
         })
         //////////////////////////////////////////////////////
         //////////////////////////////////////////////////////
-
-        Today = function () {
+        //現在の日付と時間を文字列で返すグローバル関数
+        let Today = function () {
             var dt = new Date();
             //年
             var year = dt.getFullYear();
@@ -229,7 +226,7 @@
                 })
             }
 
-            join(key) {
+            private_join(key) {
                 //uid直下、currentGroup/mypid直下の参加project一覧に追加
                 //projectのmemberにmypid追加
                 let Ref = database.ref('Account/' + uid + '/project')
@@ -266,7 +263,7 @@
 
             }
 
-            getout(key) {
+            private_getout(key) {
                 //uid直下、currentGroup/mypid直下の参加project一覧から削除
                 //projectのmemberにmypidを削除
                 let Ref = database.ref('Account/' + uid + '/project')
@@ -320,11 +317,11 @@
                 })
             }
 
-            Delete(key, P) {
+            private_delete(key, ProjectNetwork) {
                 //uid直下、currentGroup/mypid直下の参加project一覧から削除
                 //projectのrefを削除する
                 //projectのproject_listから削除するprojectのkeyを取り除いて返す
-                P.getout(key)
+                ProjectNetwork.private_getout(key)
                 let Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
                 Ref.remove()
                 let promise = new Promise(function (resolve, reject) {
@@ -376,20 +373,18 @@
                 })
             }
 
-            getMine_makeButton(P) {
-                //supdate()
+            getMine_makeButton(ProjectNetwork) {
                 //Group/直下のpost一覧からmypidでクエリしてpostを取得する
-                let finish = function (value) {
+                let createButton = function (value) {
                     let contentBlock = document.getElementById('projectkey')
-                    //contentBlock.textContent = ''
                     contentBlock.insertAdjacentHTML('afterbegin', value.key)
-
                     let btn = document.createElement('button')
                     btn.type = 'button'
                     btn.onclick = function () {
+                        //onclick function
                         alert(value.title + ' : ' + value.key)
-                        P.Delete(value.key, P)
-                        P.update()
+                        ProjectNetwork.private_delete(value.key, ProjectNetwork)
+                        ProjectNetwork.update()
                     }
                     btn.textContent = value.key + ':  Delete'
                     let pbtn = document.getElementById('projectbtn')
@@ -407,7 +402,7 @@
                         })
                     } catch (e) { reject(e) }
                 })
-
+                //一応Promiseを返す
                 return List.then(function (list) {
                     return new Promise(function (resolve, reject) {
                         try {
@@ -433,7 +428,7 @@
                                     } catch (e) { reject(e) }
                                 }))
                             }
-                            for (let p of project) p.then(function (value) { finish(value) })
+                            for (let p of project) p.then(function (value) { createButton(value) })
                             resolve(project)
                         } catch (e) { reject(e) }
                     })
@@ -574,7 +569,7 @@
                 this.Peer = new PeerNetwork()
             }
 
-            getNetworks() {
+            get() {
                 this.Network = []
                 this.Network.Account = this.Account
                 this.Network.Post = this.Post
@@ -611,8 +606,6 @@
     <input type="text" id="Groupname" />
     <button onclick="Group.createGroup(document.getElementById('Groupname').value)">make a Group</button>
     </div>
-
-
     <p>--------------------------</p>
     <div>
         <p>PUT MESSAGE</p>
@@ -651,7 +644,7 @@
                                         (document.getElementById('ProjectRecruit').value),
                                         (document.getElementById('ProjectDensity').value),
                                         (document.getElementById('ProjectPeriod').value))
-                                               ">make a Project</button>
+                                         ">make a Project</button>
 
         <button onclick="Account.isLogin()">IS LOGIN</button>
         <button onclick="Project.getMine_makeButton(Project)">getProject</button>
