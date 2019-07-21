@@ -183,7 +183,7 @@
                             //自分の参加しているすべてのグループのプロジェクトのなかで、現在のグループの中に存在しているプロジェクトを取り出す
                             for (let a of lists) {
                                 for (let b of projectlists) {
-                                    if (a === b) {
+                                    if (a === b && a.length > 1) {
                                         p += a + ','
                                     }
                                 }
@@ -275,7 +275,7 @@
                     for (let li of list) {
                         if (li === key)
                             joined = true
-                        else
+                        else if (li.length > 1)
                             _list += li + ','
                     }
                     if (joined != false) {
@@ -291,7 +291,7 @@
                         _list = ''
                         list = projects.split(',')
                         for (let li of list) {
-                            if (li !== key)
+                            if (li !== key && li.length > 1)
                                 _list += li + ','
                         }
                         Ref.update({
@@ -305,7 +305,7 @@
                             list = member.split(',')
                             _list = ''
                             for (let li of list) {
-                                if (li !== mypid)
+                                if (li !== mypid && li.length > 1)
                                     _list += li + ','
                             }
                             Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
@@ -332,7 +332,7 @@
                             let list = project_list.split(',')
                             let _list = ''
                             for (let li of list) {
-                                if (li !== key) _list += li + ','
+                                if (li !== key && li.length > 1) _list += li + ','
                             }
                             resolve(_list)
                         })
@@ -362,7 +362,7 @@
                         let list = ''
                         for (let m of mylist) {
                             for (let a of alist) {
-                                if (m == a) list += a + ','
+                                if (m === a && m.length > 1) list += a + ','
                             }
                         }
                         Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
