@@ -42,6 +42,26 @@
         let currentGroupKey//現在のGroupKey
         database.ref('Account/' + uid + '/profile/currentgroup').on('value', function (snapshot) {
             currentGroupKey = snapshot.val().groupkey
+            //currentGroupKey取得とprofile自動書き込み
+            let a = new Promise(function (resolve, reject) {
+                try {
+                    let Ref = database.ref('Account/' + uid + '/profile/')
+                    Ref.once('value').then(function (snapshot) {
+                        let tmp = []
+                        tmp.name = snapshot.val().username
+                        tmp.pic = snapshot.val().pic
+                        resolve(tmp)
+                    })
+                } catch (e) { reject(e) }
+            })
+            a.then(function (value) {
+                Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid)
+                Ref.update({
+                    username: value.name,
+                    pic: value.pic,
+                    pid: mypid
+                })
+            })
         })
         //////////////////////////////////////////////////////
         //////////////////////////////////////////////////////
@@ -79,23 +99,24 @@
 
             setProfile(name, pic) {
                 //username is String, pic is number
-                let Ref = database.ref('Account/' + uid + '/profile');
+                let Ref = database.ref('Account/' + uid + '/profile')
                 Ref.update({
                     username: name,
                     pic: pic
-                });
+                })
 
-                Ref = database.ref('Profile/' + mypid);
+                Ref = database.ref('Profile/' + mypid)
                 Ref.update({
                     username: name,
                     pic: pic
-                });
+                })
 
-                Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid);
+                Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid)
                 Ref.update({
                     username: name,
-                    pic: pic
-                });
+                    pic: pic,
+                    pid: mypid
+                })
             }
 
             isLogin() {
@@ -494,18 +515,22 @@
 
             }
 
-            createGroup(name) {
+            create(name) {
                 let groupkey = database.ref('Group/').push().key
                 let Ref = database.ref('Account/' + uid + '/group/')
-                let groups
-
                 Ref.once('value').then(function (snapshot) {
+                    let groups = ''
+                    let list = []
+                    let _list = ''
                     groups = snapshot.val().groups
-                    if (groups === undefined) groups = groupkey + ','
+                    if (groups === '') groups = groupkey + ','
                     else groups += groupkey + ','
+                    list = groups.split(',')
+                    for (let li of list) if (li.length > 1) _list += li + ','
 
+                    Ref = database.ref('Account/' + uid + '/group/')
                     Ref.update({
-                        groups: groups
+                        groups: _list
                     })
 
                     Ref = database.ref('Group/' + groupkey)
@@ -519,7 +544,6 @@
                         groupkey: groupkey
                     })
                 })
-
             }
 
             joinGroup(groupkey) {
@@ -604,7 +628,7 @@
     <p>Make a Group</p>
     <p>Group Name</p>
     <input type="text" id="Groupname" />
-    <button onclick="Group.createGroup(document.getElementById('Groupname').value)">make a Group</button>
+    <button onclick="Group.create(document.getElementById('Groupname').value)">make a Group</button>
     </div>
     <p>--------------------------</p>
     <div>
