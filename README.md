@@ -15,7 +15,7 @@ https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/
 サークルメール：tankyuclub@gmail.com
 
 # 製品：Unisle
-![logo](img/logo.png)
+![logo](img/ears/C16LHlaUQAARWKN.jpg)
 
 ## 製品概要
 ### コンセプト
