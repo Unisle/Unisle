@@ -10,8 +10,8 @@ https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/
 
 サークルメール：tankyuclub@gmail.com
 
-# プロダクト名
-![ロゴ](P2HACKS.png)
+# Unisle
+![logo](img/logo.png)
 
 ## 製品概要
 ### コンセプト
