@@ -7,3 +7,5 @@
 
 計画ドキュメント
 https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing
+
+サークルメール：tankyuclub@gmail.com
