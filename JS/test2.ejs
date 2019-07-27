@@ -40,8 +40,16 @@
             mypid = snapshot.val().pid
         })
         let currentGroupKey//現在のGroupKey
+        let pids = []//peerのpid配列
+
         database.ref('Account/' + uid + '/profile/currentgroup').on('value', function (snapshot) {
             currentGroupKey = snapshot.val().groupkey
+            //peer pid get
+            database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
+                let pid = snapshot.val().pid
+                if (pid != mypid) pids.push(pid)
+                database.ref('Group/' + currentGroupKey + '/profile').off(snapshot.val())
+            })
             //currentGroupKey取得とprofile自動書き込み
             let a = new Promise(function (resolve, reject) {
                 try {
@@ -62,7 +70,18 @@
                     pid: mypid
                 })
             })
+            database.ref('Account/' + uid + '/profile/currentgroup').off(snapshot.val())
         })
+        /*  new Promise(function (resolve, reject) {
+              try {
+                  database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
+                      let pid = snapshot.val().pid
+                      if (pid != mypid) pids.push(pid)
+                      resolve(snapshot.val())
+                  })
+              } catch (e) { reject(e) }
+          }).then(function (snap) { database.ref('Group/' + currentGroupKey + '/profile').off(snap) })
+*/
         //////////////////////////////////////////////////////
         //////////////////////////////////////////////////////
         //現在の日付と時間を文字列で返すグローバル関数
@@ -159,6 +178,10 @@
                 }
             }
 
+            getpeer() {
+                let contentBlock = document.getElementById('pids')
+                contentBlock.insertAdjacentHTML('afterbegin', pids[0])
+            }
         }
 
 
@@ -678,6 +701,8 @@
             <div id="body"></div>
             <button onclick="Post.get()">get post</button>
         </div>
+        <button onclick="Account.getpeer()">get peer</button>
+        <div id="pids"></div>
         <script>
             //document.addEventListener('DOMContentLoaded', Account.isLogin)
         </script>
