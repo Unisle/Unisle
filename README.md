@@ -9,7 +9,7 @@
 * 活動密度：週一回程度 + 自由作業
 * フィードバック：二週間に一回
 
-計画ドキュメント
+計画ドキュメント:
 https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing
 
 サークルメール：tankyuclub@gmail.com
@@ -19,10 +19,13 @@ https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/
 
 ## 製品概要
 ### コンセプト
-一言で　例．オープンスペース・オープンマインド
+個々の個性を引き出す
+お互いについての情報を増やすことでよりコラボレーションを促進する
 
 ### 背景（製品開発のきっかけ、課題等）
-ほげほげ
+サークル内での講義やプロジェクトの立ち上げ、コラボなどを気軽にできるような仕組みを作りたい。
+サークルの活動についての情報を適切な形で管理したい。
+などの想いから本アプリを開発することに決定。
 
 ### 製品説明（具体的な製品の説明）
 
@@ -48,14 +51,14 @@ https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/
 ## 開発内容・開発技術
 ### 活用した技術
 #### 言語
-- ほげほげ
-- ほげほげ
+- HTML & CSS
+- JavaScript
 
 #### フレームワーク・ライブラリ・モジュール（使っていれば）
-- ほげほげ
-- ほげほげ
+- Firebase/Hosting,RealTimeDatabase,CloudFunction,Authentication
+- BootStrap
 
 ## メンバーの役割
-- 未来 太郎：フロントエンドとかxx画面とか、読む人に伝わるように
+- 伊藤　壱：サーバーサイド全般、データ構造の設計、デプロイ、アプリ機能の考案、アプリ全体の思想設計
 - 未来 二郎：バックエンドとかArduinoとか、わかりやすく
 - 未来 花子：デザイン（アプリロゴ）とか、とにかくやったことを書いてください
