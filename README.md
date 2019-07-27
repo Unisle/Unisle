@@ -10,7 +10,7 @@
 * フィードバック：二週間に一回
 
 計画ドキュメント:
-https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing
+- https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing
 
 サークルメール：tankyuclub@gmail.com
 
@@ -41,7 +41,12 @@ https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/
 ほげほげ
 
 ### 解決出来ること
-ほげほげ
+* サークルでのコミュニケーションが不足している状況
+* 同じサークルに入っているけどなかなか同士が見つからない状況
+* チームで活動したいけどチームが作れていない状況
+* お互いの予定を知らないから気軽なお誘いもしにくい状況
+* 仲間が興味を持っていることを知りたい状況
+* 仲間がどんな風に活動、努力しているのか知りたい状況
 
 ### 今後の展望
 - ほげほげ
@@ -54,7 +59,7 @@ https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/
 - HTML & CSS
 - JavaScript
 
-#### フレームワーク・ライブラリ・モジュール（使っていれば）
+#### フレームワーク・ライブラリ・モジュール
 - Firebase/Hosting,RealTimeDatabase,CloudFunction,Authentication
 - BootStrap
 
