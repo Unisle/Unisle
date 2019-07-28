@@ -9,8 +9,8 @@
 * 活動密度：週一回程度 + 自由作業
 * フィードバック：二週間に一回
 
-- ドキュメント:
-    - [年間計画書](https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing)
+1. #### Documents:
+    1. [年間計画書](https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing)
 
 e-mail：tankyuclub@gmail.com
 
