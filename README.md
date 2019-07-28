@@ -9,10 +9,10 @@
 * 活動密度：週一回程度 + 自由作業
 * フィードバック：二週間に一回
 
-計画ドキュメント:
-- https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing
+- ドキュメント:
+    - [年間計画書](https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing)
 
-サークルメール：tankyuclub@gmail.com
+e-mail：tankyuclub@gmail.com
 
 # 製品：Unisle
 ![logo](img/ears/C16LHlaUQAARWKN.jpg)
