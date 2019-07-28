@@ -66,6 +66,6 @@
 ## メンバーの役割
 - 伊藤　壱：
     - サーバーサイド全般、データ構造の設計、デプロイ、アプリ機能の考案、アプリ全体の思想設計
-    - [Wiki by Hajime](https://github.com/Unisle/Unisle.wiki.git)
+    - [Wiki by Hajime](https://github.com/Unisle/Unisle/wiki/Hajime's-Room)
 - 未来 二郎：バックエンドとかArduinoとか、わかりやすく
 - 未来 花子：デザイン（アプリロゴ）とか、とにかくやったことを書いてください
