@@ -32,17 +32,17 @@ e-mail：tankyuclub@gmail.com
 
 ### 特長
 
-#### 可視化 
-* サークルメンバーの後で見ようと思っている記事、チャレンジしてみたいこと、予定、忙しさを可視化します。
+- #### 可視化 
+    - サークルメンバーの後で見ようと思っている記事、チャレンジしてみたいこと、予定、忙しさを可視化します。
 
-#### 運営
-* サークル全体の運営データや取り決めなどをまとめられます
+- #### 運営
+    - サークル全体の運営データや取り決めなどをまとめられます
 
-#### コミュニケーション  
-* サークルメンバーそれぞれが相手に見てほしい記事や論文などをメンションして送れます
+- #### コミュニケーション  
+    - サークルメンバーそれぞれが相手に見てほしい記事や論文などをメンションして送れます
 
-#### Slack連携
-* Slackと連携して本アプリの通知をslackアプリを経由してスマホに送れます。slackアプリから本アプリの操作もできます。
+- #### Slack連携
+    - Slackと連携して本アプリの通知をslackアプリを経由してスマホに送れます。slackアプリから本アプリの操作もできます。
 
 ### 解決出来ること
 * サークルでのコミュニケーションが不足している状況
@@ -59,13 +59,13 @@ e-mail：tankyuclub@gmail.com
 
 ## 開発内容・開発技術
 ### 活用した技術
-#### 言語
-- HTML & CSS
-- Javascript
+- #### 言語
+    - HTML & CSS
+    - Javascript
 
-#### フレームワーク・ライブラリ・モジュール
-- [Firebase](https://firebase.google.com/?hl=ja)/Hosting,RealTimeDatabase,CloudFunction,Authentication
-- [Bootstrap](https://getbootstrap.com/)
+- #### フレームワーク・ライブラリ・モジュール
+    - [Firebase](https://firebase.google.com/?hl=ja)/Hosting,RealTimeDatabase,CloudFunction,Authentication
+    - [Bootstrap](https://getbootstrap.com/)
 
 ## メンバーの役割
 - 伊藤　壱：
