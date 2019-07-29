@@ -33,13 +33,16 @@ e-mail：tankyuclub@gmail.com
 ### 特長
 
 #### 1つ目 
-ほげほげ
+サークルメンバーの後で見ようと思っている記事、チャレンジしてみたいこと、予定、忙しさを可視化します。
 
 #### 2つ目
-ほげほげ
+サークル全体の運営データや取り決めなどをまとめられます
 
-#### Nつ目  
-ほげほげ
+#### 3つ目  
+サークルメンバーそれぞれが相手に見てほしい記事や論文などをメンションして送れます
+
+### 4つ目
+Slackと連携して本アプリの通知をslackアプリを経由してスマホに送れます。slackアプリから本アプリの操作もできます。
 
 ### 解決出来ること
 * サークルでのコミュニケーションが不足している状況
@@ -50,19 +53,19 @@ e-mail：tankyuclub@gmail.com
 * 仲間がどんな風に活動、努力しているのか知りたい状況
 
 ### 今後の展望
-- ほげほげ
-- ほげほげ
+- 他のサークルにも使ってもらいたい
+- 統計データをヴィジュアル化して見やすく表現したい
 
 
 ## 開発内容・開発技術
 ### 活用した技術
 #### 言語
 - HTML & CSS
-- JavaScript
+- Javascript
 
 #### フレームワーク・ライブラリ・モジュール
-- Firebase/Hosting,RealTimeDatabase,CloudFunction,Authentication
-- BootStrap
+- [Firebase](https://firebase.google.com/?hl=ja)/Hosting,RealTimeDatabase,CloudFunction,Authentication
+- [Bootstrap](https://getbootstrap.com/)
 
 ## メンバーの役割
 - 伊藤　壱：
