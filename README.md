@@ -3,16 +3,17 @@
 
 ![logo](img/logo.png)
 
-* 内容：当サークル用便利アプリの開発
-* メンバー募集：常時募集、開発を楽しめる人（重要！）
-* 期間：今年度内に完成を目指す
-* 活動密度：週一回程度 + 自由作業
-* フィードバック：二週間に一回
+- #### About
+    - 内容：当サークル用便利アプリの開発
+    - メンバー募集：常時募集、開発を楽しめる人（重要！）
+    - 期間：今年度内に完成を目指す
+    - 活動密度：週一回程度 + 自由作業
+    - フィードバック：二週間に一回
 
-計画ドキュメント:
-- https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing
+- #### Documents
+    - [年間計画書](https://docs.google.com/document/d/1sod-fd5aCdDr7TDYVjpg3wTdEKoDcug_aexigC7wmP0/edit?usp=sharing)
 
-サークルメール：tankyuclub@gmail.com
+e-mail：tankyuclub@gmail.com
 
 # 製品：Unisle
 ![logo](img/ears/C16LHlaUQAARWKN.jpg)
@@ -31,14 +32,17 @@
 
 ### 特長
 
-#### 1つ目 
-ほげほげ
+- #### 可視化 
+    - サークルメンバーの後で見ようと思っている記事、チャレンジしてみたいこと、予定、忙しさを可視化します。
 
-#### 2つ目
-ほげほげ
+- #### 運営
+    - サークル全体の運営データや取り決めなどをまとめられます
 
-#### Nつ目  
-ほげほげ
+- #### コミュニケーション  
+    - サークルメンバーそれぞれが相手に見てほしい記事や論文などをメンションして送れます
+
+- #### Slack連携
+    - Slackと連携して本アプリの通知をslackアプリを経由してスマホに送れます。slackアプリから本アプリの操作もできます。
 
 ### 解決出来ること
 * サークルでのコミュニケーションが不足している状況
@@ -49,21 +53,23 @@
 * 仲間がどんな風に活動、努力しているのか知りたい状況
 
 ### 今後の展望
-- ほげほげ
-- ほげほげ
+- 他のサークルにも使ってもらいたい
+- 統計データをヴィジュアル化して見やすく表現したい
 
 
 ## 開発内容・開発技術
 ### 活用した技術
-#### 言語
-- HTML & CSS
-- JavaScript
+- #### 言語
+    - HTML & CSS
+    - Javascript
 
-#### フレームワーク・ライブラリ・モジュール
-- Firebase/Hosting,RealTimeDatabase,CloudFunction,Authentication
-- BootStrap
+- #### フレームワーク・ライブラリ・モジュール
+    - [Firebase](https://firebase.google.com/?hl=ja)/Hosting,RealTimeDatabase,CloudFunction,Authentication
+    - [Bootstrap](https://getbootstrap.com/)
 
 ## メンバーの役割
-- 伊藤　壱：サーバーサイド全般、データ構造の設計、デプロイ、アプリ機能の考案、アプリ全体の思想設計
+- 伊藤　壱：
+    - サーバーサイド全般、[データ構造の設計](https://docs.google.com/document/d/16dw-9kfhTQWzxCkSjPoDmnbxZ5R1VVGLQqu1Tq2iWAg/edit?usp=sharing)、デプロイ、アプリ機能の考案、アプリ全体の思想設計、WebAPI(Slack, GoogleCalender等)実装、Readmeの作成
+    - [Wiki by Hajime](https://github.com/Unisle/Unisle/wiki/Hajime's-Room)
 - 未来 二郎：バックエンドとかArduinoとか、わかりやすく
 - 未来 花子：デザイン（アプリロゴ）とか、とにかくやったことを書いてください
