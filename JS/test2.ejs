@@ -38,6 +38,46 @@
         let mypid//自分のpeerID
         database.ref('Account/' + uid + '/profile/').on('value', function (snapshot) {
             mypid = snapshot.val().pid
+            //isLogin()の処理を追加
+            //document.addEventListener('DOMContentLoaded'...)ではpidをここで取得する前に実行されるので
+            //新しいpidが生成されてしまう
+            if (uid == undefined) alert('you did not login now')
+            else {
+                if (mypid == undefined) {
+                    //First time only fired. 初期化時の処理
+                    let tmpname = 'nanashi'
+                    let defaultpic = 0
+                    //pid生成
+                    let mypid = database.ref('Profile/').push().key
+                    let Ref = database.ref('Account/' + uid + '/profile')
+                    Ref.update({
+                        username: tmpname,
+                        pic: defaultpic,
+                        pid: mypid,
+                        attendance: false
+                    })
+
+                    Ref = database.ref('Profile/' + mypid)
+                    Ref.update({
+                        username: tmpname,
+                        pic: defaultpic,
+                        pid: mypid,
+                        attendance: false
+                    })
+                    //初期状態を確保することで読み取りからの書き込みを可能にする
+                    Ref = database.ref('Account/' + uid + '/group/')
+                    Ref.update({
+                        groups: ','
+                    })
+                    //初期状態を確保することで読み取りからの書き込みを可能にする
+                    Ref = database.ref('Account/' + uid + '/project')
+                    Ref.update({
+                        projects: ","
+                    })
+                }
+            }
+            //リスナーをデタッチ
+            database.ref('Account/' + uid + '/profile/').off(snapshot.val())
         })
         let currentGroupKey//現在のGroupKey
         let pids = []//peerのpid配列
@@ -72,16 +112,6 @@
             })
             database.ref('Account/' + uid + '/profile/currentgroup').off(snapshot.val())
         })
-        /*  new Promise(function (resolve, reject) {
-              try {
-                  database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
-                      let pid = snapshot.val().pid
-                      if (pid != mypid) pids.push(pid)
-                      resolve(snapshot.val())
-                  })
-              } catch (e) { reject(e) }
-          }).then(function (snap) { database.ref('Group/' + currentGroupKey + '/profile').off(snap) })
-*/
         //////////////////////////////////////////////////////
         //////////////////////////////////////////////////////
         //現在の日付と時間を文字列で返すグローバル関数
