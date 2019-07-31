@@ -73,3 +73,4 @@ e-mail：tankyuclub@gmail.com
     - [Wiki by Hajime](https://github.com/Unisle/Unisle/wiki/Hajime's-Room)
 - 未来 二郎：バックエンドとかArduinoとか、わかりやすく
 - 未来 花子：デザイン（アプリロゴ）とか、とにかくやったことを書いてください
+- 太島　陸:ホームページ作成
