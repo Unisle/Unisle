@@ -72,8 +72,8 @@ e-mail：tankyuclub@gmail.com
     - サーバーサイド全般、[データ構造の設計](https://docs.google.com/document/d/16dw-9kfhTQWzxCkSjPoDmnbxZ5R1VVGLQqu1Tq2iWAg/edit?usp=sharing)、デプロイ、アプリ機能の考案、アプリ全体の思想設計、WebAPI(Slack, GoogleCalender等)実装、Readmeの作成
     - [Wiki by Hajime](https://github.com/Unisle/Unisle/wiki/Hajime's-Room)
 - 原田　裕斗：
-    -
+    - null
 - 小林　浩也：
-    -
+    - null
 - 太島　陸 : 
     - ホームページ作成
