@@ -66,7 +66,7 @@ e-mail：tankyuclub@gmail.com
 - #### フレームワーク・ライブラリ・モジュール
     - [Firebase](https://firebase.google.com/?hl=ja)/Hosting,RealTimeDatabase,CloudFunction,Authentication
     - [Bootstrap](https://getbootstrap.com/)
-    - [Native Javascript for Bootstrap](http://thednp.github.io/bootstrap.native/)
+    - [Native Javascript for Bootstrap](http://thednp.github.io/bootstrap.native/)//余裕があれば
 
 ## メンバーの役割
 - 伊藤　壱：
