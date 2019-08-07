@@ -75,6 +75,6 @@ e-mail：tankyuclub@gmail.com
 - 原田　裕斗：
     - null
 - 小林　浩也：
-    - null
+    - ホームページデザイン、画像素材作成
 - 太島　陸 : 
     - ホームページ作成
