@@ -233,8 +233,7 @@ class ProjectNetwork {
     getMine_makeButton(ProjectNetwork) {
         //Group/直下のpost一覧からmypidでクエリしてpostを取得する
         let createButton = function (value) {
-            let contentBlock = document.getElementById('projectkey')
-            contentBlock.insertAdjacentHTML('afterbegin', value.key)
+
             let btn = document.createElement('button')
             btn.type = 'button'
             btn.onclick = function () {
@@ -243,9 +242,16 @@ class ProjectNetwork {
                 ProjectNetwork.private_delete(value.key, ProjectNetwork)
                 ProjectNetwork.update()
             }
-            btn.textContent = value.key + ':  Delete'
-            let pbtn = document.getElementById('projectbtn')
-            pbtn.appendChild(btn)
+            btn.textContent = 'Delete'
+
+            let tr_element = document.createElement('tr')
+            let parent_object = document.getElementById('tablebody')
+            tr_element.innerHTML = '<tr><th>' + value.title + '</th></tr><tr><td>' + value.startdate + '</td></tr>'
+                + '<tr><td id="' + value.key + 'AAAA">' + '</td></tr>'
+            parent_object.appendChild(tr_element)
+            let pb = document.getElementById(value.key + 'AAAA')
+            pb.appendChild(btn)
+            //.insertBefore(btn, tr_element.nextSibling)
         }
 
         let List = new Promise(function (resolve, reject) {

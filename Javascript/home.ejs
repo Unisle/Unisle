@@ -5,12 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>[firebase] my-sample-project</title>
+  <title>TEST SITE HAJIME</title>
 
 </head>
 
 <body>
   <div>
+
     <p>Make a Group</p>
     <p>Group Name</p>
     <input type="text" id="Groupname" />
@@ -18,6 +19,7 @@
   </div>
   <input type="text" id="name">
   <button onclick="writeUserData()">send</button>
+
   <div>Your Data</div>
   <p>--------------------------</p>
   <button onclick="read()">read</button>
@@ -60,6 +62,54 @@
     <input type="text" id="ProjectPeriod" />
     <button onclick="MakeProject()">make a Project</button>
   </div>
+  <p>いま誰が参加しているか?</p>
+  <div id="body"></div>
+  <button onclick="getprofile()">いま誰が参加しているか分かります</button>
+  <div id="body1"></div>
+
+  <p>招待コードを表示します↓</p>
+  <div id="currentgroupkey"></div>
+  <button onclick="showcurrentgroupkey()">招待コードを表示</button>
+
+  <p>プロジェクト一覧</p>
+  <div id="ShowProjects"></div>
+
+  <script>
+    function showcurrentgroupkey() {
+      currentgroupkey.innerHTML = handleGroup('getCurrent');
+    }
+
+    function showgroup() {
+      ShowProjects.innerHTML = handleGroup('getproject');
+    }
+    document.addEventListener('DOMContentLoaded', showgroup);
+  </script>
+  <script>
+    function getprofile() {
+      var table = $("<table>")
+      var tbody = $("<tbody>")
+      var Namelist = getProfile('getusername');
+      var Postlist = getProfile('getpost');
+      $("#body").empty();
+      $("#body1").empty();
+      for (let i = 0; i < Namelist.length; i++) {
+        var text = Namelist[i];
+        tbody.append("<tr><td>" + text + 'さん' + "</td></tr>")
+        table.append(tbody);
+
+        $("#body").append(table);
+      }
+      for (let i = 0; i < Postlist.length; i++) {
+        let message = Postlist[i][1];
+        let name = Postlist[i][0];
+        let date = Postlist[i][2];
+        tbody.append("<tr><td>" + name + 'さん : ' + message + " on: " + date + "</td></tr>")
+        table.append(tbody);
+
+        $("#body1").append(table);
+      }
+    }
+  </script>
 
   <div>
     <iframe
@@ -88,7 +138,7 @@
 
     database = firebase.database();
 
-    function writeUserData() {
+    function writeUserData(ref) {
       const userid = firebase.auth().currentUser.uid;
       var Ref = database.ref('Account/' + userid + '/profile');
       var name = document.getElementById('name').value;
@@ -101,14 +151,41 @@
     }
 
 
-    function load() {
-      var Uid = sessionStorage.getItem('key');
+    function load(isWrite) {
+      var Uid = sessionStorage.getItem('uid');
       var Ref = database.ref('Account/' + Uid + '/profile');
+      var a;
       Ref.on('value', function (snapshot) {
-        Uname.innerHTML = snapshot.val().username;
+        a = snapshot.val().username;
         uid.innerHTML = snapshot.val().uid;
+        // Uname.innerHTML = snapshot.val().username;
+        if (isWrite == true) {
+          t(a)
+        }
       });
+      //a = "ddddd"
+      // Uname.innerHTML = a
+      return a
     }
+
+    function tt() {
+      load(true)
+    }
+
+
+
+    function t(a) {
+      var contentBlock = document.getElementById('Uname');
+      contentBlock.insertAdjacentHTML('afterbegin', a);
+    }
+
+    // var contentBlock = document.getElementById('Uname');
+    //  contentBlock.insertAdjacentHTML('afterbegin', TEST);
+
+    document.addEventListener('DOMContentLoaded', tt)
+
+
+
 
     function read() {
       var uname;
@@ -122,7 +199,7 @@
       uname.innerHTML = uname;
       uid.innerHTML = uid;
     }
-    document.addEventListener('DOMContentLoaded', load)
+    //  document.addEventListener('DOMContentLoaded', load)
 
     function handlePid() {
       const userid = firebase.auth().currentUser.uid;
@@ -165,8 +242,10 @@
       Ref = database.ref('Group/' + groupkey + '/profile/' + pid);
       Ref.update({
         username: username,
-        pic: pic
+        pic: pic,
+        pid: pid
       });
+
     }
 
     //Post MyPost
@@ -249,13 +328,14 @@
       var pid = handlePid();
       var projectkey = database.ref('Project/').push().key;
 
-      var tmpkey = database.ref('Group/' + groupkey + '/Account/' + userid + '/info/project/').push().key;
+      var tmpkey = database.ref('Account/' + userid + '/info/project/').push().key;
       Ref = database.ref('Account/' + userid + '/info/project/' + tmpkey);
 
       Ref.update({
         projectkey: projectkey,
         selfkey: tmpkey
       });
+      tmpkey = database.ref('Group/' + groupkey + '/Account/' + userid + '/info/project/').push().key;
 
       Ref = database.ref('Group/' + groupkey + '/profile/' + pid + '/project/' + tmpkey);
 
@@ -296,13 +376,15 @@
       });
 
       database.ref('Account/' + userid + '/profile/currentgroup').update({
+        groupname: groupname,
         groupkey: groupkey
       });
     }
 
     function handleGroup(mode) {
-      const userid = sessionStorage.getItem('key');
-      var groupList = [];
+      const userid = sessionStorage.getItem('uid');
+      var groupList = [];//key
+      var groupNameList = [];
       var currentgroup;
 
       if (mode == 'getListName') {
@@ -326,28 +408,127 @@
       else if (mode == 'setCurrent') {
         database.ref('Account/' + userid + '/profile/group/').on('child_added', function (snapshot) {
           groupList.push(snapshot.val().groupkey);
+          groupNameList.push(snapshot.val().groupname);
         });
         var i = document.getElementById('groupnum').value;
         database.ref('Account/' + userid + '/profile/currentgroup').update({
-          currentgroup: groupList[i]
+          groupkey: groupList[i],
+          groupname: groupNameList[i]
         });
       }
+      else if (mode == 'join') {
+        var groupkey = document.getElementById('GroupKey').value;
+        var groupname;
+        var tmpchildkey = database.ref('Account/' + userid + '/profile/group').push().key;
+
+        database.ref('Group/' + groupkey).on('value', function (snapshot) {
+          groupname = snapshot.val().groupname;
+        });
+
+        database.ref('Group/' + groupkey).update({
+          groupname: groupname,
+          groupkey: groupkey
+        });
+
+        database.ref('Account/' + userid + '/profile/group/' + tmpchildkey).update({
+          groupname: groupname,
+          groupkey: groupkey,
+          selfkey: tmpchildkey
+        });
+
+        database.ref('Account/' + userid + '/profile/currentgroup').update({
+          groupkey: groupkey,
+          groupname: groupname
+        });
+      }
+
     }
 
+  </script>
+
+  <script>
+    function getProfile(mode) {
+      const database = firebase.database();
+      var groupkey = handleGroup('getCurrent');
+      //Array
+      var username = [];
+      var pic = [];
+      var attendance = [];
+      var project = [];
+      var post = [];
+      //Double Array
+      var projectArray = [];
+      var postArray = [];
+      if (mode == 'getusername') {
+        database.ref('Group/' + groupkey + '/profile').on('child_added', function (snapshot) {
+          username.push(snapshot.val().username);
+        });
+        return username;
+      }
+      else if (mode == 'getpic') {
+        database.ref('Group/' + groupkey + '/profile').on('child_added', function (snapshot) {
+          pic.push(snapshot.val().pic);
+        });
+        return pic;
+      }
+      else if (mode == 'getattendance') {
+        database.ref('Group/' + groupkey + '/profile').on('child_added', function (snapshot) {
+          attendance.push(snapshot.val().attendance);
+        });
+        return attendance;
+      }
+      else if (mode == 'getproject') {
+
+        database.ref('Group/' + groupkey + '/project').on('child_added', function (snapshot) {
+          let key = snapshot.val().key;
+          let title = snapshot.val().key;
+          let startdate = snapshot.val().key;
+          let member = snapshot.val().key;
+          let content = snapshot.val().key;
+          let recruit = snapshot.val().key;
+          let period = snapshot.val().key;
+          let density = snapshot.val().key;
+          project.push(snapshot.val().path);
+        });
+
+        for (let count in project) {
+          projectArray.push(project[count]);
+        }
+        return projectArray[0];
+      } else if (mode == 'getpost') {
+        database.ref('Group/' + groupkey + '/profile').on('child_added', function (snapshot) {
+          let pid = snapshot.val().pid;
+          database.ref('Group/' + groupkey + '/profile/' + pid + '/post').on('child_added', function (snapshot) {
+            let date = snapshot.val().date;
+            let username = snapshot.val().username;
+            let message = snapshot.val().message;
+            let array = [username, message, date];
+            post.push(array);
+          });
+        });
+
+        for (let count in post) {
+          postArray.push(post[count]);
+        }
+        return postArray;
+      }
+
+    }
 
   </script>
+
   <script>
     $(document).ready(function () {
       $("#update").on('click', function () {
         alert("SEND TO SLACK");
-        var text = 'TESTED BY ' + $("#slackNAME").val();
+        var text1 = 'MESSAGE:' + $("#slackNAME").val();
         $.ajax({
           url: 'https://slack.com/api/chat.postMessage',
           type: 'POST',
           data: {
-            'token': 'xoxb-362603846448-648165628695-7hInrh0c1Fc3KuN5oJGJZIxg',
+            'token': 'xoxb-362603846448-648165628695-zVYS5EiabqD3fFM9Gv8aBIUB',
             'channel': 'CAP5X2CKD',
-            'text': text
+            'text': text1
           }
         })
           // Ajaxリクエストが成功した時発動
