@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>ClassTEST</title>
+</head>
+
+<body>
+    <div>
+        <button onclick="getpeer()">TEST FUNCTION</button>
+    </div>
+    <p>MY NAME</p>
+    <div id="body"></div>
+    <p>PEER NAME</p>
+    <div id="body1"></div>
+    <p>Peer Post</p>
+    <div id="body2"></div>
+    <p>My Post</p>
+    <div id="body3"></div>
+    <p>My Project</p>
+    <div id="body4"></div>
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-app.js"></script>
+
+    <!-- Add additional services that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-functions.js"></script>
+    <!--Jquery-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+    <script>
+        // Firebaseの初期化
+        var config = {
+            apiKey: "AIzaSyB91yPNhjOREC8S8RXEAoUaZa1gsj7s0MY",
+            authDomain: "unisle-dbba5.firebaseapp.com",
+            databaseURL: "https://unisle-dbba5.firebaseio.com",
+        };
+
+        firebase.initializeApp(config);
+        database = firebase.database();
+    </script>
+
+    <script>
+        /*
+        Root  -Account -uid -profile -username : string
+                                     -pic: int
+                                     -pid: string
+                                     -currentgroup : string
+                                     -attendance : boolean            
+
+                            -group - childkey - groupkey : string        
+                            
+                            -project - projectkey : [projectkey]....
+
+                            -post - childkey -message : string
+                                             -date : date
+                                             -selfkey : string
+                                             -group : string
+            
+
+              -Group -childkey(groupkey) -
+                               - groupkey : string  //root groupkey
+                               - groupname : string
+
+                              -project -childkey(projectkey) - //root projectkey
+                                                             -title : string   
+                                                             -key(projectkey) : string
+                             　　                            -startdate : date
+                                                             -member : Array[pid] 
+                  　　                                       -contents : string
+                  　　                                       -recruit : string
+                  　　                                       -period : string or number
+                  　　                                       -density : string
+                        
+                              -profile - childkey(pid)- 
+                                                       - pic : int
+                                                       - attendance : boolean
+                                                       -project - projectkey : [projectkey]....
+                              
+                              -post - childkey -
+                                               - message : string
+                                               - date : date
+                                               - pid : pid (for childOrder)
+                
+              -Schedule- childkey -
+                                  - day : string
+                                  - message : string
+                                  - type : number
+                                  - pid : pid (for childOrder)
+
+              -Statistic -uid -attendanceData : set[date : boolean]
+
+              -Profile - childkey(pid) -
+                                       - username : string \\root pid
+                                       - pic : int
+                                       - attendance : boolean
+                                       - pid : String
+     
+*/
+        //////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////
+
+        const uid = sessionStorage.getItem('uid')
+        const mypid = sessionStorage.getItem('pid')
+        const currentGroupKey = "-LjCTHEbdbtxA_Q9a9Td"
+        //const currentGroupKey = sessionStorage.getItem('currentGroup')
+        //  currentGroupKey = '-LjCTHEbdbtxA_Q9a9Td'
+        /*以下のプログラムはボタンを押したときに実行されるとして、
+               コンストラクタが更新されるようにしていないと、
+               パスを作るような処理が上書きではなく追加処理になってしまいゴミが増える
+        */
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /*  
+        var _getCurrentGroupKey = function () {
+            let current = ''
+            database.ref('Account/' + 'PzexgoZy7NaxDReiaK4lqNTkLCI3' + '/profile/currentgroup').once('value', function (snapshot) {
+                let currents = snapshot.val().groupkey
+                body4.innerHTML = currents
+                current = currents
+            })
+
+            if (current === '') {
+                alert("undefined")
+            }
+            return current
+        }
+        */
+
+        function _getMyGroupList() {
+            let myGroupList = []//[[key:String, name:String], [key:XXXX, name:YYYYY], .....]
+
+            database.ref('Account/' + uid + '/profile/group/').on('child_added', function (snapshot) {
+                let tmp = []
+                tmp.key = snapshot.val().groupkey
+                tmp.name = snapshot.val().groupname
+                myGroupList.push(tmp)
+            })
+            //database.ref('Account/' + uid + '/profile/group/').off()
+            return myGroupList
+        }
+
+        function _getPeerList(network) {
+            let peerList = []
+            database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
+                let s = snapshot.val()
+                if (s.pid != mypid) {
+                    let peer = new peerAccount(s.pid, s.username, s.pic, false, network)
+                    peerList.push(peer)
+                }
+            })
+            if (peerList === []) alert("DDDD")
+            //database.ref('Group/' + currentGroupKey + '/profile').off()
+            return peerList
+        }
+
+        function _private_DeleteNOTEXSITProject() {
+            let projectKeyList = [];
+            let AllProjectKeyList = [];
+            let deleteProjectList = [];
+
+            database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project').on('child_added', function (snapshot) {
+                let tmp = [];
+                tmp.key = snapshot.val().projectkey;
+                tmp.selfkey = snapshot.val().selfkey;
+                projectKeyList.push(tmp);
+            });
+
+            database.ref('Group/' + currentGroupKey + '/project/').on('child_added', function (snapshot) {
+                let tmp = [];
+                tmp.key = snapshot.val().projectkey;
+                tmp.selfkey = snapshot.val().selfkey;
+                AllProjectKeyList.push(tmp);
+            });
+
+            for (let myproject of projectKeyList) {
+                let count = false;
+                for (allproject of AllProjectKeyList) {
+                    if (allproject.projectkey == myproject.projectkey) {
+                        count = true;    //一回でもprojectが存在していることを確認したらtrue
+                    }
+                }
+                if (count == false) {
+                    deleteProjectList.push(allproject.selfkey);
+                }
+            }
+
+            for (let selfkey in deleteProjectList) {
+                database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project/' + selfkey).remove();
+            }
+
+            projectKeyList = [];//Init
+
+            database.ref('Account/' + uid + '/info/project').on('child_added', function (snapshot) {
+                let tmp = [];
+                tmp.key = snapshot.val().projectkey;
+                tmp.selfkey = snapshot.val().selfkey;
+                projectKeyList.push(tmp);
+            });
+
+            deleteProjectList = [];//Init
+
+            for (let myproject in projectKeyList) {
+                let count = false;
+                for (let allproject in AllProjectKeyList) {
+                    if (allproject.projectkey == myproject.projectkey) {
+                        count = true;    //一回でもprojectが存在していることを確認したらtrue
+                    }
+                }
+                if (count == false) {
+                    deleteProjectList.push(allproject.selfkey);
+                }
+            }
+
+            for (let selfkey in deleteProjectList) {
+                database.ref('Account/' + uid + '/info/project/' + selfkey).remove();
+            }
+        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        class Network {
+
+            constructor() {
+                this.uid = uid
+                this.mypid = mypid
+                this.currentGroupKey = currentGroupKey
+            }
+
+            getUid() {
+                return this.uid
+            }
+
+            getMyPid() {
+                return this.mypid
+            }
+
+            getCurrentGroupKey() {
+                return currentGroupKey
+            }
+
+            getPeerProfileList(network) {
+                return _getPeerList()
+            }
+
+            getMyGroupList() {
+                return _getMyGroupList()
+            }
+
+            private_CmpPid(pid) {
+                for (let plist in getPeerProfileList()) {
+                    if (pid == plist.pid) {
+                        return plist
+                    }
+                    else {
+                        return null
+                    }
+                }
+                return null
+            }
+
+            private_DeleteNOTEXSITProject() {
+                _private_DeleteNOTEXSITProject()
+            }
+
+            Today() {
+                return Static.Today()
+            }
+        }
+        //tmp ok
+        class NetworkAccount extends Network {
+            constructor() {
+                super();
+            }
+
+            setUserName(username) {
+                //username is String
+                let Ref = database.ref('Account/' + uid + '/profile');
+                Ref.update({
+                    username: username
+                });
+
+                Ref = database.ref('Profile/' + mypid);
+                Ref.update({
+                    username: username
+                });
+
+                Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid);
+                Ref.update({
+                    username: username
+                });
+            }
+
+            setProfilePic(type) {
+                //type is Int
+                //type determine default profile picture
+                let Ref = database.ref('Account/' + uid + '/profile');
+                Ref.update({
+                    pic: type
+                });
+
+                Ref = database.ref('Profile/' + mypid);
+                Ref.update({
+                    pic: type
+                });
+
+                Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid);
+                Ref.update({
+                    pic: type
+                });
+            }
+
+            getMyProfile(isWrite, type, id) {
+                let tmp = [];
+                database.ref('Account/' + uid + '/profile').on('value', function (snapshot) {
+                    tmp.pid = snapshot.val().pid;
+                    tmp.name = snapshot.val().username;
+                    tmp.pic = snapshot.val().pic;
+                    //tmp.attendance = snapshot.val().attendance;
+
+                    if (isWrite == true) {
+                        //ここでの関数は実行できない
+                        /*load時に定数、データベースからの値に関わらず
+                        スナップショットで返されるundifinedで終わってしまう
+                        ので、スナップショット内でhtmlに書き込む. 
+                        Trueのとき実行されるようにする*/
+                        //idでhtml内のclass(id)をしていする
+                        if (type == 'pid') {
+                            let contentBlock = document.getElementById(id);
+                            contentBlock.insertAdjacentHTML('afterbegin', tmp.pid);
+                        }
+                        else if (type == 'name') {
+                            let contentBlock = document.getElementById(id);
+                            contentBlock.insertAdjacentHTML('afterbegin', tmp.name);
+                        }
+                        else if (type == 'pic') {
+                            let contentBlock = document.getElementById(id);
+                            contentBlock.insertAdjacentHTML('afterbegin', tmp.pic);
+                        } else if (type == 'attendance') {
+                            let contentBlock = document.getElementById(id);
+                            contentBlock.insertAdjacentHTML('afterbegin', tmp.attendance);
+                        } else {
+
+                        }
+
+                    }
+                });
+                return tmp
+            }
+
+            isLogin() {
+                if (uid == null) {
+                    return false
+                }
+                else {
+                    if (mypid == null) {
+                        //First time only fired.
+                        const tmpname = 'nanashi';
+                        const defaultpic = 0;
+                        this.mypid = database.ref('Profile/').push().key;
+
+                        let Ref = database.ref('Account/' + this.uid + '/profile');
+                        Ref.update({
+                            username: tmpname,
+                            pic: defaultpic,
+                            pid: this.mypid,
+                            attendance: false
+                        });
+
+                        Ref = database.ref('Profile/' + this.mypid);
+                        Ref.update({
+                            username: tmpname,
+                            pic: defaultpic,
+                            pid: this.mypid,
+                            attendance: false
+                        });
+
+                        Ref = database.ref('Group/' + this.currentGroupKey + '/profile/' + this.mypid);
+                        Ref.update({
+                            username: tmpname,
+                            pic: defaultpic,
+                            pid: this.mypid,
+                            attendance: false
+                        });
+                    }
+
+                    return true
+                }
+            }
+
+        }
+
+        function _isJoinedProject(projectkey) {
+            let isjoined = false;
+            database.ref('Account/' + uid + '/info/project/').on('child_added', function (snapshot) {
+                if (projectkey == snapshot.val().projectkey) {
+                    isjoined = true;
+                }
+            });
+            return isjoined;
+        }
+
+        function _joinProject(projectkey) {
+            //uip,group直下に書き込む、またmemberから自分を追加して返す必要がある
+            let selfkey = database.ref('Account/' + uid + '/info/project/').push().key;
+            let Ref = database.ref('Account/' + uid + '/info/project/' + selfkey);
+
+            Ref.update({
+                projectkey: projectkey,
+                selfkey: selfkey
+            });
+
+            selfkey = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project/').push().key;
+            Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project/' + selfkey);
+
+            Ref.update({
+                projectkey: projectkey,
+                selfkey: selfkey
+            });
+
+            let member = [];
+
+            database.ref('Group/' + currentGroupKey + '/project/' + projectkey).on('value', function (snapshot) {
+                member = snapshot.val().member;
+            });
+
+            member.push(mypid);
+
+            Ref = database.ref('Group/' + currentGroupKey + '/project/' + projectkey);
+
+            Ref.update({
+                member: member
+            });
+        }
+
+        function _escapeProject(projectkey) {
+            //uid,group直下に書き込む、またmemberから自分を削除して返す必要がある
+
+            let selfkey;
+            database.ref('Account/' + uid + '/info/project/').on('child_added', function (snapshot) {
+                if (projectkey == snapshot.val().projectkey) {
+                    selfkey = snapshot.val().selfkey;
+                }
+            });
+
+            database.ref('Account/' + uid + '/info/project/' + selfkey).remove();
+
+            database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project/').on('child_added', function (snapshot) {
+                if (projectkey == snapshot.val().projectkey) {
+                    selfkey = snapshot.val().selfkey;
+                }
+            });
+
+            database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project/' + selfkey).remove();
+
+            let member = [];
+
+            database.ref('Group/' + currentGroupKey + '/project/' + projectkey).on('value', function (snapshot) {
+                for (let member in snapshot.val().member) {
+                    if (mypid != member) {
+                        member.push(member);
+                    }
+                }
+            });
+
+            Ref = database.ref('Group/' + currentGroupKey + '/project/' + projectkey);
+
+            Ref.update({
+                member: member
+            });
+        }
+
+        function __getMyProjectList() {
+            let projectKeyList = []
+            database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project').on('child_added', function (snapshot) {
+                let tmp = []
+                tmp.key = snapshot.val().projectkey
+                tmp.selfkey = snapshot.val().selfkey
+                projectKeyList.push(tmp)
+            })
+            return projectKeyList
+        }
+
+        function _getMyProjectList() {
+            //getする際に存在するかどうかチェックし、存在しない場合はchildkeyごと削除する
+            let projectList = []
+
+            database.ref('Group/' + currentGroupKey + '/project').on('child_added', function (snapshot) {
+                let tmp = []
+                tmp.key = snapshot.val().key
+                tmp.title = snapshot.val().title
+                tmp.startdate = snapshot.val().startdate
+                tmp.member = snapshot.val().member
+                tmp.content = snapshot.val().content
+                tmp.recruit = snapshot.val().recruit
+                tmp.period = snapshot.val().period
+                tmp.density = snapshot.val().density
+                projectList.push(tmp)
+            })
+
+            return projectList//連想配列の配列
+
+            /*   for (let project of projectKeyList) {
+                   for (let list of projectList) {
+                       if (project.key != list.key) {
+                           //list = null
+                       }
+                   }
+               }*/
+
+            //let projects = projectList.filter(v => v)
+        }
+
+        function _getGroupProjectList() {
+            let projectList = [];
+            database.ref('Group/' + currentGroupKey + '/project').on('child_added', function (snapshot) {
+                let tmp = []
+                tmp.key = snapshot.val().key
+                tmp.title = snapshot.val().title
+                tmp.startdate = snapshot.val().startdate
+                tmp.member = snapshot.val().member
+                tmp.content = snapshot.val().content
+                tmp.recruit = snapshot.val().recruit
+                tmp.period = snapshot.val().period
+                tmp.density = snapshot.val().density
+                projectList.push(tmp)
+            });
+            return projectList;//連想配列の配列
+        }
+        //ok
+        class NetworkProject extends Network {
+            constructor() {
+                super()
+            }
+
+            isJoinedProject(projectkey) {
+                return _isJoinedProject(projectkey)
+            }
+
+            createProject(List) {
+                //List contains title, content_message, recruit_message, period, density_message, member
+                //member is pid Array, othres is String
+
+                let date = Today();
+                let projectkey = database.ref('Group/' + this.currentGroupKey + '/project/').push().key;//一括管理のための最重要key
+                let key = database.ref('Account/' + this.uid + '/info/project/').push().key;
+                let Ref = database.ref('Account/' + this.uid + '/info/project/' + key);
+
+                Ref.update({
+                    projectkey: projectkey,
+                    selfkey: key
+                });
+
+                key = database.ref('Group/' + this.currentGroupKey + '/profile/' + this.mypid + '/project/').push().key;
+
+                Ref = database.ref('Group/' + this.currentGroupKey + '/profile/' + this.mypid + '/project/' + key);
+
+                Ref.update({
+                    projectkey: projectkey,
+                    selfkey: key
+                });
+
+                Ref = database.ref('Group/' + this.currentGroupKey + '/project/' + projectkey);
+
+                Ref.update({
+                    key: projectkey,
+                    title: List.title,
+                    startdate: date,
+                    member: List.member,
+                    content: List.content_message,
+                    recruit: List.recruit_message,
+                    period: List.period,
+                    density: List.density_message
+                });
+            }
+
+            editProject(key, List) {
+                Ref = database.ref('Group/' + this.currentGroupKey + '/project/' + key);
+                Ref.update({
+                    title: List.title,
+                    content: List.content_message,
+                    recruit: List.recruit_message,
+                    period: List.period,
+                    density: List.density_message
+                });
+            }
+
+            joinProject(projectkey) {
+                _joinProject(projectkey)
+            }
+
+            escapeProject(projectkey) {
+                _escapeProject(projectkey)
+            }
+
+            deleteProject(projectkey) {
+                //deleteしたが他のpeerからしたら感知できなくuid,group-profile直下のデータを削除できない
+                //なのでprojectlistをgetするときに存在するかチェックを挟み、存在しなければ削除する処理を追加する
+                database.ref('Group/' + this.currentGroupKey + '/project/' + projectkey).remove();
+            }
+
+            getMyProjectList() {
+                //private_DeleteNOTEXSITProject()
+                return _getMyProjectList()  //連想配列の配列
+            }
+
+            getGroupProjectList() {
+                return _getGroupProjectList()//連想配列の配列
+            }
+        }
+
+        function _getMyPostList() {
+            let postList = []
+            let name
+
+            database.ref('Account/' + uid + '/info/username').on('value', function (snapshot) {
+                name = snapshot.val().username
+            })
+
+            database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/post').on('child_added', function (snapshot) {
+                let tmp = []
+                tmp.date = snapshot.val().date
+                tmp.name = name
+                tmp.message = snapshot.val().message
+                postList.push(tmp)
+            });
+
+            return postList//連想配列の配列
+        }
+
+        //一応完成
+        class NetworkPost extends Network {
+            constructor() {
+                super();
+            }
+
+            setPost(message) {
+                let date = Today();
+                let key = database.ref('Account/' + uid + '/info/post/').push().key;
+                let Ref = database.ref('Account/' + uid + '/info/post/' + key);
+
+                Ref.update({
+                    // username: this.username,
+                    //usernameは廃止してget時に現在のusernameを与える方法ではpeerpostをgetする際にpeerのusernameが識別できない
+                    //ので、group内のプロファイルから参照することにする
+                    message: message,
+                    date: date,
+                    selfkey: key
+                    /*uid直下でkeyを管理し、削除もここで行う。データの同期のためgroup直下のデータに関しては
+                      すべて削除したうえでuidからコピーしてくるようにする*/
+                });
+
+                key = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/post/').push().key;
+                Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/post/' + key);
+
+                Ref.update({
+                    //username: this.username,
+                    message: message,
+                    date: date
+                });
+            }
+
+            deletePost(key) {
+                database.ref('Account/' + uid + '/info/post/' + key).remove();
+                database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/post/' + key).remove();
+            }
+
+            getMyPostList() {
+                return _getMyPostList()//連想配列の配列
+            }
+
+            //一応Peerのpostを取得する処理はPeerAccount Classに実装されているので代替え可能
+            /*
+            getGroupPostList() {
+                let postList = [];
+                database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
+                    let pids = snapshot.val().pid;
+
+                    database.ref('Group/' + currentGroupKey + '/profile/' + pids + '/post').on('child_added', function (snapshot) {
+                        let tmp = [];
+                        tmp.date = snapshot.val().date;
+                        tmp.name = snapshot.val().username;
+                        tmp.message = snapshot.val().message;
+                        postList.push(tmp);
+                    });
+                });
+
+                return postList;//連想配列の配列
+            }
+            */
+        }
+
+        function _getMyScheduleList() {
+            let Ref = database.ref('Account/' + uid + '/info/shedule');
+            let scheduleList = [];//連想配列の配列
+            Ref.on('child_added', function (snapshot) {
+                let tmp = [];
+                tmp.message = snapshot.val().message;
+                tmp.date = snapshot.val().date;
+                tmp.type = snapshot.val().type;
+                tmp.key = snapshot.val().selfkey;
+                scheduleList.push(tmp);
+            });
+
+            return scheduleList;
+        }
+
+        function _getGroupScheduleList() {
+            let scheduleList = [];
+            database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
+                let pids = snapshot.val().pid;
+
+                database.ref('Group/' + currentGroupKey + '/profile/' + pids + '/schedule').on('child_added', function (snapshot) {
+                    let tmp = [];
+                    tmp.date = snapshot.val().date;
+                    if (private_CmpPid(pids) != null) {
+                        tmp.name = private_CmpPid(pids).name;
+                    }
+                    else {
+                        tmp.name = snapshot.val().username;
+                    }
+                    tmp.message = snapshot.val().message;
+                    scheduleList.push(tmp);
+                });
+            });
+
+            return scheduleList;//連想配列の配列
+        }
+        //ok
+        class NetworkSchedule extends Network {
+            constructor() {
+                super();
+            }
+
+            setSchedule(message, type) {
+                //message is String, type is int
+                //制限数を設ける予定　およそ1o個くらい
+                let date = Today();
+                let key = database.ref('Account/' + this.uid + '/info/schedule/').push().key;
+                let Ref = database.ref('Account/' + this.uid + '/info/shedule/' + key);
+
+                Ref.update({
+                    message: message,
+                    date: date,
+                    type, type,
+                    selfkey: key
+                });
+
+                key = database.ref('Group/' + this.currentGroupKey + '/profile/' + this.mypid + '/schedule/').push().key;
+                Ref = database.ref('Group/' + this.currentGroupKey + '/profile/' + this.mypid + '/schedule/' + key);
+
+                Ref.update({
+                    message: message,
+                    date: date,
+                    type: type
+                });
+            }
+
+            getMyScheduleList() {
+                return _getMyScheduleList()
+            }
+
+            //以下getList系はすべての投稿をまとめて取得できる（共有ページを想定）
+            getGroupScheduleList() {
+                return _getGroupScheduleList()//連想配列の配列
+            }
+        }
+
+        //ok
+        class NetworkGroup extends Network {
+            constructor() {
+                super();
+            }
+
+            createGroup(name) {
+                // name is String
+                let groupkey = database.ref('Group/').push().key;
+                let tmpchildkey = database.ref('Account/' + this.uid + '/profile/group').push().key;
+
+                database.ref('Group/' + this.currentGroupKey).update({
+                    groupname: name,
+                    groupkey: groupkey
+                });
+
+                database.ref('Account/' + this.uid + '/profile/group/' + tmpchildkey).update({
+                    groupname: name,
+                    groupkey: groupkey,
+                    selfkey: tmpchildkey
+                });
+
+                database.ref('Account/' + this.uid + '/profile/currentgroup').update({
+                    groupname: name,
+                    groupkey: groupkey
+                });
+            }
+
+            joinGroup(groupkey) {
+                //groupkey is String
+                let groupname;
+                let childkey = database.ref('Account/' + this.uid + '/profile/group').push().key;
+
+                database.ref('Group/' + groupkey).on('value', function (snapshot) {
+                    groupname = snapshot.val().groupname;
+                });
+
+                database.ref('Group/' + groupkey).update({
+                    groupname: groupname,
+                    groupkey: groupkey
+                });
+
+                database.ref('Account/' + this.uid + '/profile/group/' + childkey).update({
+                    groupname: groupname,
+                    groupkey: groupkey,
+                    selfkey: childkey
+                });
+
+                database.ref('Account/' + this.uid + '/profile/currentgroup').update({
+                    groupkey: groupkey,
+                    groupname: groupname
+                });
+            }
+
+            selectCurrentGroup(index) {
+                let myGroupList = getMyGroupList()
+                database.ref('Account/' + this.uid + '/profile/currentgroup').update({
+                    groupkey: myGroupList[index].key,
+                    groupname: myGroupList[index].name
+                });
+            }
+
+        }
+
+        function _getPeerPostList(pid, name) {
+            let postList = [];
+            alert("dd")
+            database.ref('Group/' + currentGroupKey + '/profile/' + pid + '/post').on('child_added', function (snapshot) {
+                let tmp = [];
+                tmp.date = snapshot.val().date;
+                tmp.name = name
+                tmp.message = snapshot.val().message;
+                postList.push(tmp);
+            });
+
+            if (postList === []) {
+                alert("SSS")
+            }
+
+            return postList//連想配列の配列
+        }
+
+        function _getPeerScheduleList(pid, name) {
+            let scheduleList = [];
+
+            database.ref('Group/' + currentGroupKey + '/profile/' + pid + '/schedule').on('child_added', function (snapshot) {
+                let tmp = []
+                tmp.date = snapshot.val().date
+                tmp.name = name
+                tmp.message = snapshot.val().message
+                scheduleList.push(tmp)
+            })
+
+            return scheduleList//連想配列の配列
+        }
+
+
+        function _getPeerProjectList(pid) {
+            let projectKeyList = [];
+            let projectList = [];
+
+            database.ref('Group/' + currentGroupKey + '/profile/' + pid + '/project').on('child_added', function (snapshot) {
+                let tmp = [];
+                tmp.key = snapshot.val().projectkey;
+                //tmp.selfkey = snapshot.val().selfkey;
+                projectKeyList.push(tmp);
+            });
+            for (let project of projectKeyList) {
+                database.ref('Group/' + currentGroupKey + '/project/' + project.key).once('value', function (snapshot) {
+                    let tmp = [];
+                    tmp.key = snapshot.val().key;
+                    tmp.title = snapshot.val().title;
+                    tmp.startdate = snapshot.val().startdate;
+                    tmp.member = snapshot.val().member;
+                    tmp.content = snapshot.val().content;
+                    tmp.recruit = snapshot.val().recruit;
+                    tmp.period = snapshot.val().period;
+                    tmp.density = snapshot.val().density;
+                    projectList.push(tmp);
+                });
+            }
+            return projectList;//連想配列の配列
+        }
+
+        //完成
+        class NetworkPeer extends Network {
+
+            constructor() {
+                super()
+            }
+
+            //以下Pidをもとに取得するメソッド
+            getPeerPostList(pid, name) {
+                return _getPeerPostList(pid, name)
+            }
+
+            getPeerScheduleList(pid, name) {
+                return _getPeerScheduleList(pid, name)
+            }
+
+            getPeerProjectList(pid) {
+                return _getPeerProjectList(pid)
+            }
+        }
+
+        class HandleNetwork {
+            constructor() {
+                this.NetworkAccount = new NetworkAccount();
+                this.NetworkProject = new NetworkProject();
+                this.NetworkPost = new NetworkPost();
+                this.NetworkSchedule = new NetworkSchedule();
+                this.NetworkGroup = new NetworkGroup();
+                this.NetworkPeer = new NetworkPeer();
+            }
+
+            getNetworks() {
+                let network = [];
+                network.Account = this.NetworkAccount
+                network.Project = this.NetworkProject
+                network.Post = this.NetworkPost
+                network.Schedule = this.NetworkSchedule
+                network.Peer = this.NetworkPeer
+                network.Group = this.NetworkGroup
+                return network
+            }
+
+            getNetworkAccount() {
+                return this.NetworkAccount
+            }
+
+            getNetworkProject() {
+                return this.NetworkProject
+            }
+
+            getNetworkPost() {
+                return this.NetworkPost
+            }
+
+            getNetworkSchedule() {
+                return this.NetworkSchedule
+            }
+
+            getNetworkGroup() {
+                return this.NetworkGroup
+            }
+
+            getNetworkPeer() {
+                return this.NetworkPeer
+            }
+        }
+
+        class Static {
+            constructor() {
+            }
+            static Today() {
+                var dt = new Date();
+                //年
+                var year = dt.getFullYear();
+                //月
+                //1月が0、12月が11。そのため+1をする。
+                var month = dt.getMonth() + 1;
+                //日
+                var date = dt.getDate();
+                //曜日
+                //日曜が0、土曜日が6。配列を使い曜日に変換する。
+                dateT = ["日", "月", "火", "水", "木", "金", "土"];
+                var day = dateT[dt.getDay()];
+                //時
+                var hours = dt.getHours();
+                //分
+                var minutes = dt.getMinutes();
+                //秒
+                var seconds = dt.getSeconds();
+
+                var ToDate = String(year) + "年" + String(month) + "月" + String(date) + "日" +
+                    + " (" + String(day) + ") " + String(hours) + ":" + String(minutes)
+                    + ":" + String(seconds);
+
+                return ToDate;
+            }
+        }
+
+        class FactoryAccount {
+
+            constructor(networks) {
+                this.networks = networks;//getNetworks() from HandleNetwork class
+            }
+
+            //Use on load
+            create() {
+                //自分のAccountを作成
+                this.MyAccount = new MyAccount(this.networks)
+            }
+
+            getPeerAccountList() {
+                return this.networks.Peer.getPeerProfileList(this.networks.Peer)
+            }
+
+            getMyAccount() {
+                return this.MyAccount
+            }
+
+            freePeerAccountList() {
+                this.peerAccountList = []
+            }
+
+            freeMyAccount() {
+                this.MyAccount = null
+            }
+
+        }
+
+        class Account {
+
+            constructor() {
+
+            }
+
+            getname() {
+                return 'nanashi';
+            }
+
+            getpid() {
+                return null;
+            }
+
+            getpic() {
+                return 0;
+            }
+
+            getattendance() {
+                return false;
+            }
+
+            getpost() {
+                return null;
+            }
+
+            getschedeule() {
+                return null;
+            }
+
+            getproject() {
+                return null;
+            }
+        }
+
+        class peerAccount extends Account {
+
+            constructor(pid, name, pic, attendance, network) {
+                super()
+                this.name = name
+                this.pid = pid
+                this.pic = pic
+                this.attendance = attendance
+                this.network = network
+            }
+
+            //権限がある行動についてのメソッド群
+
+            getname() {
+                return this.name;
+            }
+
+            getpid() {
+                return this.pid;
+            }
+
+            getpic() {
+                return this.pic;
+            }
+
+            getattendance() {
+                return this.attendance;
+            }
+
+            getpost() {
+                return this.network.getPeerPostList(this.pid, this.name);
+            }
+
+            getschedeule() {
+                return this.network.getPeerScheduleList(this.pid, this.name);
+            }
+
+            getproject() {
+                return this.network.getPeerProjectList(this.pid);
+            }
+        }
+
+        class MyAccount extends Account {
+
+            constructor(network) {
+                super()
+                this.network = network
+            }
+
+            isLogin() {
+                return this.network.Account.isLogin()//boolean
+            }
+
+            //権限がある行動についてのメソッド群
+
+            getname(isWrite, id) {
+                //boolean, string
+                return this.network.Account.getMyProfile(isWrite, 'name', id).name
+            }
+
+            getpid(isWrite, id) {
+                return this.network.Account.getMyProfile(isWrite, 'pid', id).pid
+            }
+
+            getpic(isWrite, id) {
+                return this.network.Account.getMyProfile(isWrite, 'pic', id).pic
+            }
+
+            getattendance(isWrite, id) {
+                return this.network.Account.getMyProfile(isWrite, 'attendance', id).attendance
+            }
+
+            getproject() {
+                return this.network.Project.getMyProjectList()
+            }
+
+
+            getpost() {
+                return this.network.Post.getMyPostList()
+            }
+
+            getschedeule() {
+                return this.network.Schedule.getMyScheduleList()
+            }
+
+            editProfile(List) {
+                this.network.Account.setUserName(List.name)
+                this.network.Account.setProfilePic(List.pic)
+            }
+
+            setPost(message) {
+                this.network.Post.setPost(message)
+            }
+
+            deletePost(key) {
+                this.network.Post.deletePost(key)
+            }
+
+            createProject(List) {
+                this.network.Project.createProject(List)
+            }
+
+            joinProject(key) {
+                //既に参加しているかチェックする必要がある
+                if (this.network.Project.isJoinedProject(key) == false) {
+                    this.network.Project.joinProject(key)
+                }
+            }
+
+            escapeProject(key) {
+                //既に参加しているかチェックする必要がある
+                if (this.network.Project.isJoinedProject(key) == true) {
+                    this.network.Project.escapeProject(key)
+                }
+            }
+
+            deleteProject(key) {
+                //簡単にできないようにすべきか？
+                /////
+                ////
+                ////
+            }
+
+            editProject(key, List) {
+                this.network.Project.editProject(key, List)
+            }
+
+            makeGroup(name) {
+                //簡単にできないようにすべきか？
+                this.network.Group.createGroup(name)
+            }
+
+            joinGroup(key) {
+                //招待があった場合
+                this.network.Group.joinGroup(key)
+            }
+
+            escapeGroup(key) {
+                ///
+                ////
+                ////
+            }
+
+        }
+
+        class Main {
+
+            constructor() {
+                this.Network = new HandleNetwork()
+                this.Account = new FactoryAccount(this.Network.getNetworks())
+                this.Account.create()
+                ////////////////////////////////////////////////
+
+                this.MyAccount = this.Account.getMyAccount()
+                this.PeerAccountList = this.Account.getPeerAccountList()
+
+                ////////////////////////////////////////////////
+
+                if (this.MyAccount.isLogin() != true) {
+                    this.Network = null
+                    this.Account = null
+                    this.MyAccount = null
+                    this.PeerAccountList = null
+                }
+            }
+
+            load() {
+                this.Network = null
+                this.Account = null
+                this.MyAccount = null
+                this.PeerAccountList = null
+                this.Network = new HandleNetwork()
+                this.Account = new FactoryAccount(this.Network.getNetworks())
+                this.Account.create()
+                this.MyAccount = this.Account.getMyAccount()
+                this.PeerAccountList = this.Account.getPeerAccountList()
+            }
+
+            getMyAccount() {
+                return this.MyAccount
+            }
+
+            getPeerAccountList() {
+                return this.PeerAccountList
+            }
+        }
+
+
+    </script>
+
+    <script>
+
+        const main = new Main()
+        function TEST() {
+            main.getMyAccount().getname(true, 'body')
+        }
+
+        function getpeer() {
+            for (let peer of main.getPeerAccountList()) {
+                let contentBlock = document.getElementById('body1')
+                contentBlock.insertAdjacentHTML('afterbegin', peer.getname() + "さん")
+
+                for (let post of peer.getpost()) {
+                    let contentBlock = document.getElementById('body2')
+                    contentBlock.insertAdjacentHTML('afterbegin', peer.getname() + ":" + post.message + ' ' + post.date)
+                }
+
+                for (let p of peer.getproject()) {
+                    let contentBlock = document.getElementById('body4')
+                    contentBlock.insertAdjacentHTML('afterbegin', "join:" + p.title)
+                }
+
+                for (let my of peer.getpost()) {
+                    let contentBlock = document.getElementById('body3')
+                    contentBlock.insertAdjacentHTML('afterbegin', my.message + my.date)
+                }
+
+            }
+
+
+        }
+
+
+        //document.addEventListener('DOMContentLoaded', getpeer)
+        document.addEventListener('DOMContentLoaded', TEST)
+
+    </script>
+
+
+</body>
+
+</html>

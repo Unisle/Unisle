@@ -65,7 +65,7 @@ class AccountNetwork {
 
     getpeer() {
         let contentBlock = document.getElementById('pids')
-        contentBlock.insertAdjacentHTML('afterbegin', pids[0])
+        for (let p of pids) contentBlock.insertAdjacentHTML('afterbegin', p + '  ')
     }
 
     getcurrentGroup() {

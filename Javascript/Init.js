@@ -1,3 +1,63 @@
+let card = (pids) => {
+    let parent_object = document.getElementById('rowCard')
+    for (let p of pids) {
+        let cardrow = document.createElement('div')
+        cardrow.className = 'row'
+
+        let card = document.createElement('div')
+        card.className = 'col-sm-6 col-md-3'
+
+        let cardimg = document.createElement('div')
+        cardimg.className = 'card img-thumbnail'
+
+        let cardimgtop = document.createElement('img')
+        cardimgtop.className = 'card-img-top'
+        cardimgtop.src = '../img/akko.png'
+        cardimgtop.alt = 'Account'
+
+        let cardbody = document.createElement('div')
+        cardbody.className = 'card-body px-2 py-3'
+
+        let cardtitle = document.createElement('h5')
+        cardtitle.className = 'card-title'
+        //let text = document.createTextNode('pid')
+        //cardtitle.appendChild(text)
+        cardtitle.innerHTML = 'タイトル'
+
+        let cardtext = document.createElement('p')
+        cardtext.className = 'card-text'
+        let text = document.createTextNode('コンテンツ')
+        cardtext.appendChild(text)
+        let btn = document.createElement('p')
+        btn.className = 'mb-0'
+
+        let btn0 = document.createElement('a')
+        btn0.className = 'btn btn-primary btn-sm'
+        btn0.href = '#'
+        text = document.createTextNode('Button0')
+        btn0.appendChild(text)
+
+        let btn1 = document.createElement('a')
+        btn1.className = 'btn btn-secondary btn-sm'
+        btn1.href = '#'
+        text = document.createTextNode('Button1')
+        btn1.appendChild(text)
+
+        let a1 = parent_object.appendChild(card).appendChild(cardimg)
+        a1.appendChild(cardimgtop)
+        let a2 = parent_object.appendChild(card).appendChild(cardimg).appendChild(cardbody)
+        a2.appendChild(cardtitle)
+        a2.appendChild(cardtext)
+        a2.appendChild(btn).appendChild(btn0)
+        a2.appendChild(btn).appendChild(btn1)
+    }
+}
+
+let Init_func_currentGroupKey = (currentGroupKey) => {
+    let contentBlock1 = document.getElementById('currentGroupKey')
+    contentBlock1.insertAdjacentHTML('afterbegin', 'currentGroupKey :' + currentGroupKey)
+}
+
 const uid = sessionStorage.getItem('uid')//自分のuserID
 let mypid//自分のpeerID
 database.ref('Account/' + uid + '/profile/').on('value', function (snapshot) {
@@ -45,21 +105,38 @@ database.ref('Account/' + uid + '/profile/').on('value', function (snapshot) {
 })
 let currentGroupKey//現在のGroupKey
 let pids = []//peerのpid配列
-database.ref('Account/' + uid + '/profile/currentgroup').on('value', function (snapshot) {
-    currentGroupKey = snapshot.val().groupkey
-    ///////////////////////////////////////
-    //テスト用
-    let contentBlock1 = document.getElementById('currentGroupKey')
-    contentBlock1.insertAdjacentHTML('afterbegin', "currentGroupKey : " + currentGroupKey)
-    /////////////////////////////////////////
+
+let promise_currentGroupKey = new Promise(function (resolve, reject) {
+    try {
+        database.ref('Account/' + uid + '/profile/currentgroup').on('value', function (snapshot) {
+            currentGroupKey = snapshot.val().groupkey
+            resolve(currentGroupKey)
+            database.ref('Account/' + uid + '/profile/currentgroup').off(snapshot.val())
+        })
+    } catch (e) { reject(e) }
+})
+promise_currentGroupKey.then(function (currentGroupKey) {
+    //////////////////////////////////////////////////
+    Init_func_currentGroupKey(currentGroupKey)
+    /////////////////////////////////////////////////
     //peer pid get
-    database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
-        let pid = snapshot.val().pid
-        if (pid != mypid) pids.push(pid)
-        database.ref('Group/' + currentGroupKey + '/profile').off(snapshot.val())
+    let promise_pid = new Promise(function (resolve, reject) {
+        try {
+            database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
+                let pid = snapshot.val().pid
+                if (pid != mypid) pids.push(pid)
+                resolve()
+                database.ref('Group/' + currentGroupKey + '/profile').off(snapshot.val())
+            })
+        } catch (e) { reject(e) }
+    })
+    promise_pid.then(function () {
+        ///////////////////////////////////////////////////////////////////////////////////////                          
+        card(pids)
+        /////////////////////////////////////////////////////////////////////////////////////////////
     })
     //currentGroupKey取得とprofile自動書き込み
-    let a = new Promise(function (resolve, reject) {
+    let promise_profile = new Promise(function (resolve, reject) {
         try {
             let Ref = database.ref('Account/' + uid + '/profile/')
             Ref.once('value').then(function (snapshot) {
@@ -70,7 +147,7 @@ database.ref('Account/' + uid + '/profile/currentgroup').on('value', function (s
             })
         } catch (e) { reject(e) }
     })
-    a.then(function (value) {
+    promise_profile.then(function (value) {
         Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid)
         Ref.update({
             username: value.name,
@@ -78,8 +155,9 @@ database.ref('Account/' + uid + '/profile/currentgroup').on('value', function (s
             pid: mypid
         })
     })
-    database.ref('Account/' + uid + '/profile/currentgroup').off(snapshot.val())
+
 })
+
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 //現在の日付と時間を文字列で返すグローバル関数

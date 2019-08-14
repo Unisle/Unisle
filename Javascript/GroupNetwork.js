@@ -59,4 +59,30 @@ class GroupNetwork {
         })
     }
 
+    getGroups_join_makeButton() {
+        let Ref = database.ref('Account/' + uid + "/group")
+        Ref.once('value').then(function (snapshot) {
+            let _list = snapshot.val().groups
+            let list = _list.split(',')
+            for (let l of list) if (l.length > 1) {
+                let btn = document.createElement('button')
+                btn.type = 'button'
+                btn.onclick = function () {
+                    //onclick function
+                    //GroupNetwork.join(l)
+                }
+                btn.textContent = l + 'に参加'
+
+                let a_element = document.createElement('a')
+                a_element.innerHTML = '<a' + ' class="dropdown-item"' + ' id="BB"' + '</a>'
+                let parent_object = document.getElementById('joinGroups')
+                parent_object.appendChild(a_element)
+                parent_object = document.getElementById('BB')
+                parent_object.appendChild(btn)
+            }
+            //createButton(l)
+        })
+        window.location.reload(true)
+    }
+
 }

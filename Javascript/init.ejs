@@ -7,21 +7,10 @@
 </head>
 
 <body>
-    <p>何番目のグループにいきますか？？</p>
-    <button onclick="a()">show groups</button>
-    <div>
-        <input type="text" id="groupnum" />
-        <button onclick="handleGroup('setCurrent')">set group</button>
-    </div>
-    <div id="body">
-    </div>
 
-    <p>グループをつくりますか？？</p>
-    <input type="text" id="Groupname" />
-    <button onclick="makeGroup()">set group</button>
+    <h2>いらっしゃい。以下のURLへどうぞ。</h2>
 
-    <a href="/home">行き先を決めたら押してください！</a>
-
+    <a href="/test">テスト用ですよ～</a>
 
 
     <!-- Firebase App is always required and must be first -->
@@ -48,13 +37,20 @@
         database = firebase.database();
 
         function handleGroup(mode) {
-            const userid = sessionStorage.getItem('key');
-            var groupList = [];
+            const userid = sessionStorage.getItem('uid');
+            var groupList = [];//key
+            var groupNameList = [];
             var currentgroup;
 
-            if (mode == 'getList') {
+            if (mode == 'getListName') {
                 database.ref('Account/' + userid + '/profile/group/').on('child_added', function (snapshot) {
                     groupList.push(snapshot.val().groupname);
+                });
+                return groupList;
+            }
+            else if (mode == 'getList') {
+                database.ref('Account/' + userid + '/profile/group/').on('child_added', function (snapshot) {
+                    groupList.push(snapshot.val().groupkey);
                 });
                 return groupList;
             }
@@ -67,19 +63,46 @@
             else if (mode == 'setCurrent') {
                 database.ref('Account/' + userid + '/profile/group/').on('child_added', function (snapshot) {
                     groupList.push(snapshot.val().groupkey);
+                    groupNameList.push(snapshot.val().groupname);
                 });
                 var i = document.getElementById('groupnum').value;
                 database.ref('Account/' + userid + '/profile/currentgroup').update({
-                    currentgroup: groupList[i]
+                    groupkey: groupList[i],
+                    groupname: groupNameList[i]
                 });
             }
-        }
+            else if (mode == 'join') {
+                var groupkey = document.getElementById('GroupKey').value;
+                var groupname;
+                var tmpchildkey = database.ref('Account/' + userid + '/profile/group').push().key;
 
+                database.ref('Group/' + groupkey).on('value', function (snapshot) {
+                    groupname = snapshot.val().groupname;
+                });
+
+                database.ref('Group/' + groupkey).update({
+                    groupname: groupname,
+                    groupkey: groupkey
+                });
+
+                database.ref('Account/' + userid + '/profile/group/' + tmpchildkey).update({
+                    groupname: groupname,
+                    groupkey: groupkey,
+                    selfkey: tmpchildkey
+                });
+
+                database.ref('Account/' + userid + '/profile/currentgroup').update({
+                    groupkey: groupkey,
+                    groupname: groupname
+                });
+            }
+
+        }
 
         function a() {
             var table = $("<table>")
             var tbody = $("<tbody>")
-            var list = handleGroup('getList');
+            var list = handleGroup('getListName');
             $("#body").empty();
             for (let i = 0; i < list.length; i++) {
                 var text = list[i];
@@ -89,7 +112,6 @@
                 $("#body").append(table);
             }
         }
-        document.addEventListener('DOMContentLoaded', a)
 
         function makeGroup() {
             const userid = firebase.auth().currentUser.uid;
