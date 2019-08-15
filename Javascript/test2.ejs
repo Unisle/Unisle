@@ -428,6 +428,11 @@
 
     <p>ようこそ、ゆっくりしていってね！</p>
 
+    <h3>あなたのアカウント</h3>
+
+    <div class="row" id="Mycard"></div>
+
+
     <h3>プロジェクト一覧</h3>
     <div class="container">
         <table class="table">
@@ -548,24 +553,31 @@
             parent_object.appendChild(tr_element)
         }
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        let Mycard = () => {
 
-        let card = (pids) => {
-            let parent_object = document.getElementById('rowCard')
-            for (let p of pids) {
+            database.ref('Account/' + uid + '/profile').once('value').then(function (snapshot) {
+                let parent_object = document.getElementById('Mycard')
                 let cardrow = document.createElement('div')
                 cardrow.className = 'row'
 
                 let card = document.createElement('div')
-                card.className = 'col-sm-2 col-md-2'
+                card.className = 'col-sm-3 col-md-3'
 
                 let cardimg = document.createElement('div')
                 cardimg.className = 'card img-thumbnail'
 
                 let cardimgtop = document.createElement('img')
                 cardimgtop.className = 'card-img-top'
-                cardimgtop.src = '../img/akko.png'
+                if (snapshot.val().pic == 0)
+                    cardimgtop.src = '../img/akko.png'
+                else if (snapshot.val().pic == 1)
+                    cardimgtop.src = '../img/akko1.jpg'
+                else if (snapshot.val().pic == 2)
+                    cardimgtop.src = '../img/sucy.png'
+                else if (snapshot.val().pic == 3)
+                    cardimgtop.src = '../img/sucy1.jpg'
+                else cardimgtop.src = '../img/diana.gif'
+
                 cardimgtop.alt = 'Account'
 
                 let cardbody = document.createElement('div')
@@ -573,51 +585,103 @@
 
                 let cardtitle = document.createElement('h5')
                 cardtitle.className = 'card-title'
-                //let text = document.createTextNode('pid')
-                //cardtitle.appendChild(text)
-                cardtitle.innerHTML = p
+                cardtitle.innerHTML = snapshot.val().username
 
                 let cardtext = document.createElement('p')
                 cardtext.className = 'card-text'
                 let text = document.createTextNode('自己紹介文')
                 cardtext.appendChild(text)
-                let btn = document.createElement('p')
-                btn.className = 'mb-0'
-
-                let btn0 = document.createElement('a')
-                btn0.className = 'btn btn-primary btn-sm'
-                btn0.href = '#'
-                text = document.createTextNode('通知を送る')
-                btn0.onclick = function () {
-                    let Ref = database.ref('Notice/')
-                    let key = Ref.push().key
-                    Ref = database.ref('Notice/' + key)
-                    Ref.update({
-                        owner: p,
-                        from: mypid,
-                        type: 0,
-                        day: Today(),
-                        selfkey: key
-                    })
-                    alert(p + 'へ通知を送りました')
-                }
-
-
-                btn0.appendChild(text)
-
-                let btn1 = document.createElement('a')
-                btn1.className = 'btn btn-secondary btn-sm'
-                btn1.href = '#'
-                text = document.createTextNode('見る')
-                btn1.appendChild(text)
 
                 let a1 = parent_object.appendChild(card).appendChild(cardimg)
                 a1.appendChild(cardimgtop)
                 let a2 = parent_object.appendChild(card).appendChild(cardimg).appendChild(cardbody)
                 a2.appendChild(cardtitle)
                 a2.appendChild(cardtext)
-                a2.appendChild(btn).appendChild(btn0)
-                a2.appendChild(btn).appendChild(btn1)
+            })
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        let card = (pids) => {
+            for (let p of pids) {
+                database.ref('Group/' + currentGroupKey + '/profile/' + p).once('value').then(function (snapshot) {
+                    let parent_object = document.getElementById('rowCard')
+                    let cardrow = document.createElement('div')
+                    cardrow.className = 'row'
+
+                    let card = document.createElement('div')
+                    card.className = 'col-sm-2 col-md-2'
+
+                    let cardimg = document.createElement('div')
+                    cardimg.className = 'card img-thumbnail'
+
+                    let cardimgtop = document.createElement('img')
+                    cardimgtop.className = 'card-img-top'
+                    if (snapshot.val().pic == 0)
+                        cardimgtop.src = '../img/akko.png'
+                    else if (snapshot.val().pic == 1)
+                        cardimgtop.src = '../img/akko1.jpg'
+                    else if (snapshot.val().pic == 2)
+                        cardimgtop.src = '../img/sucy.png'
+                    else if (snapshot.val().pic == 3)
+                        cardimgtop.src = '../img/sucy1.jpg'
+                    else cardimgtop.src = '../img/diana.gif'
+
+                    cardimgtop.alt = 'Account'
+
+                    let cardbody = document.createElement('div')
+                    cardbody.className = 'card-body px-1 py-1'
+
+                    let cardtitle = document.createElement('h5')
+                    cardtitle.className = 'card-title'
+                    //let text = document.createTextNode('pid')
+                    //cardtitle.appendChild(text)
+                    cardtitle.innerHTML = snapshot.val().username
+
+                    let cardtext = document.createElement('p')
+                    cardtext.className = 'card-text'
+                    let text = document.createTextNode('自己紹介文')
+                    cardtext.appendChild(text)
+                    let btn = document.createElement('p')
+                    btn.className = 'mb-0'
+
+                    let btn0 = document.createElement('a')
+                    btn0.className = 'btn btn-primary btn-sm'
+                    btn0.href = '#'
+                    text = document.createTextNode('通知を送る')
+                    btn0.onclick = function () {
+                        let Ref = database.ref('Notice/')
+                        let key = Ref.push().key
+                        Ref = database.ref('Notice/' + key)
+                        Ref.update({
+                            owner: p,
+                            from: mypid,
+                            type: 0,
+                            day: Today(),
+                            selfkey: key
+                        })
+                        alert(p + 'へ通知を送りました')
+                    }
+
+
+                    btn0.appendChild(text)
+
+                    let btn1 = document.createElement('a')
+                    btn1.className = 'btn btn-secondary btn-sm'
+                    btn1.href = '#'
+                    text = document.createTextNode('見る')
+                    btn1.appendChild(text)
+
+                    let a1 = parent_object.appendChild(card).appendChild(cardimg)
+                    a1.appendChild(cardimgtop)
+                    let a2 = parent_object.appendChild(card).appendChild(cardimg).appendChild(cardbody)
+                    a2.appendChild(cardtitle)
+                    a2.appendChild(cardtext)
+                    a2.appendChild(btn).appendChild(btn0)
+                    a2.appendChild(btn).appendChild(btn1)
+
+                })
             }
         }
 
@@ -628,68 +692,71 @@
 
         const uid = sessionStorage.getItem('uid')//自分のuserID
         let mypid//自分のpeerID
-        database.ref('Account/' + uid + '/profile/').on('value', function (snapshot) {
-            mypid = snapshot.val().pid
-            //isLogin()の処理を追加
-            //document.addEventListener('DOMContentLoaded'...)ではpidをここで取得する前に実行されるので
-            //新しいpidが生成されてしまう
-            if (uid == undefined) alert('you did not login now')
-            else {
-                if (mypid == undefined) {
-                    //First time only fired. 初期化時の処理
-                    let tmpname = 'nanashi'
-                    let defaultpic = 0
-                    //pid生成
-                    let mypid = database.ref('Profile/').push().key
-                    let Ref = database.ref('Account/' + uid + '/profile')
-                    Ref.update({
-                        username: tmpname,
-                        pic: defaultpic,
-                        pid: mypid,
-                        attendance: false
-                    })
+        let Promise_mypid = new Promise(function (resolve, reject) {
+            try {
+                database.ref('Account/' + uid + '/profile/').on('value', function (snapshot) {
+                    mypid = snapshot.val().pid
+                    //isLogin()の処理を追加
+                    //document.addEventListener('DOMContentLoaded'...)ではpidをここで取得する前に実行されるので
+                    //新しいpidが生成されてしまう
+                    if (uid == undefined) alert('you did not login now')
+                    else {
+                        if (mypid == undefined) {
+                            //First time only fired. 初期化時の処理
+                            let tmpname = 'nanashi'
+                            let defaultpic = 0
+                            //pid生成
+                            let mypid = database.ref('Profile/').push().key
+                            let Ref = database.ref('Account/' + uid + '/profile')
+                            Ref.update({
+                                username: tmpname,
+                                pic: defaultpic,
+                                pid: mypid,
+                                attendance: false
+                            })
 
-                    Ref = database.ref('Profile/' + mypid)
-                    Ref.update({
-                        username: tmpname,
-                        pic: defaultpic,
-                        pid: mypid,
-                        attendance: false
-                    })
-                    //初期状態を確保することで読み取りからの書き込みを可能にする
-                    Ref = database.ref('Account/' + uid + '/group/')
-                    Ref.update({
-                        groups: ','
-                    })
-                    //初期状態を確保することで読み取りからの書き込みを可能にする
-                    Ref = database.ref('Account/' + uid + '/project')
-                    Ref.update({
-                        projects: ","
-                    })
-                }
-            }
-            //リスナーをデタッチ
-            database.ref('Account/' + uid + '/profile/').off(snapshot.val())
-            /////////////////////////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////////////////////////       
-            let notice = []
-            database.ref('Notice/').orderByChild('owner').equalTo(mypid).on('child_added', function (snapshot) {
+                            Ref = database.ref('Profile/' + mypid)
+                            Ref.update({
+                                username: tmpname,
+                                pic: defaultpic,
+                                pid: mypid,
+                                attendance: false
+                            })
+                            //初期状態を確保することで読み取りからの書き込みを可能にする
+                            Ref = database.ref('Account/' + uid + '/group/')
+                            Ref.update({
+                                groups: ','
+                            })
+                            //初期状態を確保することで読み取りからの書き込みを可能にする
+                            Ref = database.ref('Account/' + uid + '/project')
+                            Ref.update({
+                                projects: ","
+                            })
+                        }
+                    }
+                    resolve()
+                    //リスナーをデタッチ
+                    database.ref('Account/' + uid + '/profile/').off(snapshot.val())
+                })
+            } catch (e) { reject(e) }
+        })
+
+        Promise_mypid.then(function () {
+            let Ref = database.ref('Notice/').orderByChild('owner').equalTo(mypid)
+            Ref.on('child_added', function (snapshot) {
+                let notice = []
                 notice.owner = snapshot.val().owner
                 notice.from = snapshot.val().from
                 notice.type = snapshot.val().type
                 notice.day = snapshot.val().day
-                database.ref('Notice/' + snapshot.val().selfkey).delete()
-                notice.sort(function (a, b) {
-                    return (a.date < b.date ? 1 : -1)
-                })
                 alert(notice.from + 'から通知です :' + notice.day)
                 //let contentBlock = document.getElementById('notice')
                 //contentBlock.insertAdjacentHTML('afterbegin', notice.from)
-                database.ref('Notice/').orderByChild('owner').equalTo(mypid).off(snapshot.val())
+                database.ref('Notice/' + snapshot.val().selfkey).remove()
+                Ref.off(snapshot.val())
             })
-            ///////////////////////////////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
         })
+
         let currentGroupKey//現在のGroupKey
         let pids = []//peerのpid配列
 
@@ -705,6 +772,7 @@
         promise_currentGroupKey.then(function (currentGroupKey) {
             //////////////////////////////////////////////////
             Init_func_currentGroupKey(currentGroupKey)
+            Mycard()
             /////////////////////////////////////////////////
             //peer pid get
             let promise_pid = new Promise(function (resolve, reject) {
@@ -770,7 +838,9 @@
                             project.recruit = snapshot.val().recruit
                             project.period = snapshot.val().period
                             project.density = snapshot.val().densitys
+                            ///////////////////
                             createTable(project)
+                            ///////////////////
                         }
                     })
                 }
@@ -783,6 +853,9 @@
                 tmp.date = snapshot.val().date
                 tmp.selfkey = snapshot.val().selfkey
                 tmp.owner = snapshot.val().owner
+                tmp.sort(function (a, b) {
+                    return (a.date < b.date ? 1 : -1)
+                })
                 createPostTable(tmp)
                 Ref.off(snapshot.val())
             })
@@ -794,29 +867,34 @@
         //////////////////////////////////////////////////////
         //現在の日付と時間を文字列で返すグローバル関数
         let Today = function () {
-            var dt = new Date()
+            let dt = new Date()
             //年
-            var year = dt.getFullYear()
+            let year = dt.getFullYear()
             //月
             //1月が0、12月が11。そのため+1をする。
-            var month = dt.getMonth() + 1
+            let month
+            if (dt.getMonth() > 10) month = dt.getMonth() + 1
+            else {
+                let tmp = dt.getMonth() + 1
+                month = '0' + tmp
+            }
             //日
-            var date = dt.getDate()
+            let date = dt.getDate()
             //曜日
             //日曜が0、土曜日が6。配列を使い曜日に変換する。
             dateT = ["日", "月", "火", "水", "木", "金", "土"]
-            var day = dateT[dt.getDay()]
+            let day = dateT[dt.getDay()]
             //時
-            var hours = dt.getHours()
+            let hours = dt.getHours()
             //分
-            var minutes = dt.getMinutes()
+            let minutes = dt.getMinutes()
             //秒
-            var seconds = dt.getSeconds()
+            let seconds = dt.getSeconds()
 
             /*var ToDate = String(year) + "年" + String(month) + "月" + String(date) + "日"
                 + " (" + String(day) + ") " + String(hours) + ":" + String(minutes)
                 + ":" + String(seconds);*/
-            var ToDate = String(year) + "/" + String(month) + "/" + String(date) + "/" + " " +
+            var ToDate = String(year) + "/" + String(month) + "/" + String(date) + "/" + " "
                 + String(hours) + ":" + String(minutes) + ":" + String(seconds)
 
             return ToDate;
