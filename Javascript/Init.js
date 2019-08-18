@@ -1,3 +1,4 @@
+
 let card = (pids) => {
     let parent_object = document.getElementById('rowCard')
     for (let p of pids) {

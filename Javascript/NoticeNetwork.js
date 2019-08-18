@@ -1,3 +1,4 @@
+
 class NoticeNetwork {
     constructor() { }
 
@@ -39,7 +40,7 @@ class NoticeNetwork {
             notice.day = snapshot.val().day
             database.ref('Notice/' + snapshot.val().selfkey).delete()
             notice.sort(function (a, b) {
-                return (a.date < b.date ? 1 : -1)
+                return (a.day < b.day ? 1 : -1)
             })
             let contentBlock = document.getElementById('notice')
             contentBlock.insertAdjacentHTML('afterbegin', notice.from)

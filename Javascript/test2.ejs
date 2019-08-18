@@ -56,32 +56,48 @@
             create(title, content, recruit, period, density) {
                 //List contains title, content_message, recruit_message, period, density_message, member
                 //member is pid Array, othres is String
-                let date = Today()
-                let projectkey = database.ref('Group/' + currentGroupKey + '/project/').push().key//一括管理のための最重要key
-                let Ref = database.ref('Account/' + uid + '/project')
-                let projects
-                let member
+                let date
+                let projectkey//一括管理のための最重要key
+
                 //Account/uid/projectsからprojects(一覧)を取り出す。それに乗じてすべての処理を行う
-                Ref.once('value').then(function (snapshot) {
-                    projects = snapshot.val().projects
-                    //projects(一覧)を取り出す
-                    if (projects === undefined) projects = projectkey + ','
-                    else projects += projectkey + ','
-                    //新しく作成したprojectを追加して自分の一覧に書き戻す
-                    Ref.update({
-                        projects: projects
-                    })
+                let promise_updatelist = new Promise(function (resolve, reject) {
+                    try {
+                        let Ref = database.ref('Account/' + uid + '/project')
+                        Ref.once('value').then(function (snapshot) {
+                            date = Today()
+                            projectkey = database.ref('Group/' + currentGroupKey + '/project/').push().key
+                            let projects = snapshot.val().projects
+                            //projects(一覧)を取り出す
+                            if (projects === undefined) projects = projectkey + ','
+                            else projects += projectkey + ','
+                            //新しく作成したprojectを追加して自分の一覧に書き戻す
+                            Ref.update({
+                                projects: projects
+                            })
+                            resolve(projects)
+                        })
+                    } catch (e) { reject(e) }
+                })
+
+                promise_updatelist.then(function (projects) {
                     //Group/key/projectからproject_list(グループにあるすべてのプロジェクトの一覧)を取り出す
                     //それに乗じてグループ内における自分の参加しているプロジェクト一覧を書きこむ
-                    Ref = database.ref('Group/' + currentGroupKey + '/project')
-                    Ref.once('value').then(function (snapshot) {
-                        let tmp = snapshot.val().project_list
+                    let promise_getlist = new Promise(function (resolve, reject) {
+                        try {
+                            let Ref = database.ref('Group/' + currentGroupKey + '/project')
+                            Ref.once('value').then(function (snapshot) {
+                                resolve(snapshot.val().project_list)
+                            })
+                        } catch (e) { reject(e) }
+                    })
+
+                    promise_getlist.then(function (tmp) {
                         if (tmp != undefined) {
                             //project_listが空じゃないとき
                             let list = tmp
                             list += projectkey + ','
                             //新しく作成したプロジェクトを一覧に書き込む
-                            Ref = database.ref('Group/' + currentGroupKey + '/project')
+                            let Ref = database.ref('Group/' + currentGroupKey + '/project')
                             Ref.update({
                                 project_list: list
                             })
@@ -91,7 +107,7 @@
                             //自分の参加しているすべてのグループのプロジェクトのなかで、現在のグループの中に存在しているプロジェクトを取り出す
                             for (let a of lists) {
                                 for (let b of projectlists) {
-                                    if (a === b && a.length > 1) {
+                                    if (a == b && a.length > 2) {
                                         p += a + ','
                                     }
                                 }
@@ -104,7 +120,7 @@
                         }
                         else {
                             //project_listが存在しない初期のグループにおいて
-                            Ref = database.ref('Group/' + currentGroupKey + '/project')
+                            let Ref = database.ref('Group/' + currentGroupKey + '/project')
                             Ref.update({
                                 project_list: projectkey + ','
                             })
@@ -115,7 +131,8 @@
                         }
                     })
                     //参加しているメンバーリストに自分のpidを追加して返す
-                    Ref = database.ref('Group/' + currentGroupKey + '/project/' + projectkey)
+                    let Ref = database.ref('Group/' + currentGroupKey + '/project/' + projectkey)
+                    let member
                     Ref.once('value').then(function (snapshot) {
                         member = snapshot.val().member
                     })
@@ -229,9 +246,17 @@
                 //uid直下、currentGroup/mypid直下の参加project一覧から削除
                 //projectのrefを削除する
                 //projectのproject_listから削除するprojectのkeyを取り除いて返す
-                ProjectNetwork.private_getout(key)
-                let Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
-                Ref.remove()
+                let promise_getuot = new Promise(function (resolve, reject) {
+                    try {
+                        ProjectNetwork.private_getout(key)
+                        resolve()
+                    } catch (e) { reject(e) }
+                })
+
+                promise_getuot.then(function () {
+                    database.ref('Group/' + currentGroupKey + '/project/' + key).remove()
+                })
+
                 let promise = new Promise(function (resolve, reject) {
                     try {
                         let Ref = database.ref('Group/' + currentGroupKey + '/project/')
@@ -259,21 +284,21 @@
                 //projectはグループで共有されるためpeerが削除したProjectが存在しないことが判明したら
                 //自分のproject一覧からそれを削除する必要がある
                 //Group直下の自分のproject一覧と全体のproject一覧を比較
-                Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
+                let Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
                 Ref.once('value').then(function (snapshot) {
                     let projects = snapshot.val().projects
                     let mylist = projects.split(',')
-                    Ref = database.ref('Group/' + currentGroupKey + '/project')
+                    let Ref = database.ref('Group/' + currentGroupKey + '/project')
                     Ref.once('value').then(function (snapshot) {
                         let alllist = snapshot.val().project_list
                         let alist = alllist.split(',')
                         let list = ''
                         for (let m of mylist) {
                             for (let a of alist) {
-                                if (m === a && m.length > 1) list += a + ','
+                                if (m == a && m.length > 2) list += a + ','
                             }
                         }
-                        Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
+                        let Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
                         Ref.update({
                             projects: list
                         })
@@ -399,144 +424,359 @@
         const Group = new GroupNetwork()
         const Notice = new NoticeNetwork()
     </script>
+    <div class="container-fluid">
+        <!-- ココにコンテンツを入れる -->
 
-    <nav class="navbar navbar-expand-sm navbar-dark bg-secondary mt-3 mb-3 sticky-top">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav4"
-            aria-controls="navbarNav4" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand" href="#">Unisle</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        グループ選択
-                    </a>
-                    <div id="joinGroups" class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">ユーザー設定</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">スケジュール</a>
-                </li>
-            </ul>
+
+        <nav class="navbar navbar-expand-sm navbar-light bg-light mt-2 mb-3 sticky-top">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav4"
+                aria-controls="navbarNav4" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="#">Unisle</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            グループ選択
+                        </a>
+
+                        <div id="Select Group Nav" class="dropdown-menu" aria-labelledby="dropdown1">
+
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">ユーザー設定</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">スケジュール</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container  text-white">
+                <h1 class="display-2">Welcome to Unisle!</h1>
+                <script>
+                //getElementById('display-3').insertAdjacentHTML('beforeend', ' on ' + currentGroupKey)
+                </script>
+                <p class="lead">Unisle helps your works in a team.</p>
+                <hr class="my-1">
+                <p>Seek and Learn and Practice</p>
+                <a class="btn btn-secondary btn-lg" href="#" role="button">Learn more</a>
+            </div>
         </div>
-    </nav>
 
-    <p>ようこそ、ゆっくりしていってね！</p>
+        <style type="text/css">
+            /*ここに調整CSS記述*/
+            .jumbotron {
+                background: url(../img/top.jpg) center no-repeat;
+                background-size: cover;
+            }
 
-    <h3>あなたのアカウント</h3>
+            .card-img-top {
+                width: 100%;
+                height: 15vw;
+                object-fit: cover;
+            }
 
-    <div class="row" id="Mycard"></div>
+            .card-img {
+                width: 100%;
+                height: 15vw;
+                object-fit: cover;
+            }
+
+            body {
+                /* 画像ファイルの指定 */
+                /*background-image: url(../img/back.jpg);*/
+
+                /* 画像を常に天地左右の中央に配置 */
+                background-position: center center;
+
+                /* 画像をタイル状に繰り返し表示しない */
+                background-repeat: no-repeat;
+
+                /* コンテンツの高さが画像の高さより大きい時、動かないように固定 */
+                background-attachment: fixed;
+
+                /* 表示するコンテナの大きさに基づいて、背景画像を調整 */
+                background-size: cover;
+
+                /* 背景画像が読み込まれる前に表示される背景のカラー */
+                background-color: #F5F1E9;
+            }
+        </style>
+
+        <h3>あなたのアカウント</h3>
+        <div class="card mb-3" style="max-width: 700px;">
+            <div class="row no-gutters" id="Mycard"></div>
+        </div>
 
 
-    <h3>プロジェクト一覧</h3>
-    <div class="container">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>プロジェクト名</th>
-                    <th>作成日</th>
-                    <th>編集</th>
-                </tr>
-            </thead>
-            <tbody id="tablebody">
-            </tbody>
-        </table>
+        <h3>プロジェクト一覧</h3>
+        <div class="container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>プロジェクト名</th>
+                        <th>作成日</th>
+                        <th>編集</th>
+                    </tr>
+                </thead>
+                <tbody id="tablebody">
+                </tbody>
+            </table>
+        </div>
+
+        <h3>投稿一覧</h3>
+        <div class="container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>投稿者</th>
+                        <th>メッセージ</th>
+                        <th>登校日</th>
+                    </tr>
+                </thead>
+                <tbody id="posttablebody">
+                </tbody>
+            </table>
+        </div>
+
+        <h3>他のメンバー</h3>
+        <div class="row" id="rowCard"> </div><!-- /.row -->
+
+        <h3>ツール一覧</h3>
+
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="item1-tab" data-toggle="tab" href="#item1" role="tab"
+                    aria-controls="item1" aria-selected="true">Set Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="item2-tab" data-toggle="tab" href="#item2" role="tab" aria-controls="item2"
+                    aria-selected="false">Send Post</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="item3-tab" data-toggle="tab" href="#item3" role="tab" aria-controls="item3"
+                    aria-selected="false">Create Project</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="item4-tab" data-toggle="tab" href="#item4" role="tab" aria-controls="item4"
+                    aria-selected="false">Create Group</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="item5-tab" data-toggle="tab" href="#item5" role="tab" aria-controls="item5"
+                    aria-selected="false">Select Group</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="item1" role="tabpanel" aria-labelledby="item1-tab">
+                <h6>Set Your Profile :)</h6>
+                <div class="form-group">
+                    <label for="name for profile">Name:</label>
+                    <input type="text" id="name for profile" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="pic for profile">Picture:</label>
+                    <select id="pic for profile" class="custom-select">
+                        <option>Akko0</option>
+                        <option>Akko1</option>
+                        <option>Sucy0</option>
+                        <option>Sucy1</option>
+                        <option>Diana0</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bio for profile">Bio</label>
+                    <textarea id="bio for profile" class="form-control"></textarea>
+                </div>
+                <button class="btn btn-primary rounded-pill" onclick="
+                                                let c = currentGroupKey;
+                                                if(c == undefined) c='1';
+                                                Account.setProfile(document.getElementById('name for profile').value, 
+                                                document.getElementById('pic for profile').value,
+                                                document.getElementById('bio for profile').value,
+                                                 c); location.reload()">Send
+                </button>
+            </div>
+            <div class="tab-pane fade" id="item2" role="tabpanel" aria-labelledby="item2-tab">
+                <h6>Send Great Post :)</h6>
+                <div class="form-group">
+                    <label for="message for post">Message:</label>
+                    <textarea id="message for post" class="form-control"></textarea>
+                    <button class="btn btn-primary rounded-pill"
+                        onclick="Post.set(document.getElementById('message for post').value)">Send</button>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="item3" role="tabpanel" aria-labelledby="item3-tab">
+                <h6>Create Big Project :)</h6>
+                <div class="form-group">
+                    <label for="title for project">Title:</label>
+                    <input type="text" id="title for project" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="conent for project">Content:</label>
+                    <textarea id="content for project" class="form-control"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="recruit for project">Recruit:</label>
+                    <textarea id="recruit for project" class="form-control"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="density for project">Density:</label>
+                    <input type="text" id="density for project" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="period for project">Period:</label>
+                    <input type="text" id="period for project" class="form-control">
+                </div>
+                <button class="btn btn-primary rounded-pill" onclick="Project.create(
+                                        (document.getElementById('title for project').value),
+                                        (document.getElementById('content for project').value),
+                                        (document.getElementById('recruit for project').value),
+                                        (document.getElementById('density for project').value),
+                                        (document.getElementById('period for project').value));
+                                        location.reload();
+                                         ">Create</button>
+            </div>
+            <div class="tab-pane fade" id="item4" role="tabpanel" aria-labelledby="item4-tab">
+                <h6>Create Charming Group :)</h6>
+                <div class="form-group">
+                    <label for="name for group">Group Name:</label>
+                    <input type="text" id="name for group" class="form-control">
+                    <button class="btn btn-primary rounded-pill" onclick="Group.create(document.getElementById('name for group').value);
+                        location.reload()">Create</button>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="item5" role="tabpanel" aria-labelledby="item5-tab">
+                <h6>Join Awesome Group :)</h6>
+                <div class="form-group">
+                    <label for="id for group">Group ID:</label>
+                    <input type="text" id="id for group" class="form-control">
+                    <button class="btn btn-primary rounded-pill" onclick="Group.join(document.getElementById('id for group').value);
+                        location.reload()">Join</button>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="page-footer font-small blue pt-4">
+
+            <!-- Footer Links -->
+            <div class="container-fluid text-center text-md-left">
+
+                <!-- Grid row -->
+                <div class="row">
+
+                    <!-- Grid column -->
+                    <div class="col-md-6 mt-md-0 mt-3">
+
+                        <!-- Content -->
+                        <h5 class="text-uppercase">♠UNISLE FOR YOU♠</h5>
+                        <p>my contacts</p>
+                        <p>Ito Hajime</p>
+                        <p>email: b1018194@fun.ac.jp</p>
+
+                    </div>
+                    <!-- Grid column -->
+
+                    <hr class="clearfix w-100 d-md-none pb-3">
+
+                    <!-- Grid column -->
+                    <div class="col-md-3 mb-md-0 mb-3">
+
+                        <!-- Links -->
+                        <h5 class="text-uppercase">Links</h5>
+
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="#!">Link 1</a>
+                            </li>
+                            <li>
+                                <a href="#!">Link 2</a>
+                            </li>
+                            <li>
+                                <a href="#!">Link 3</a>
+                            </li>
+                            <li>
+                                <a href="#!">Link 4</a>
+                            </li>
+                        </ul>
+
+                    </div>
+                    <!-- Grid column -->
+
+                    <!-- Grid column -->
+                    <div class="col-md-3 mb-md-0 mb-3">
+
+                        <!-- Links -->
+                        <h5 class="text-uppercase">Links</h5>
+
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="#!">Link 1</a>
+                            </li>
+                            <li>
+                                <a href="#!">Link 2</a>
+                            </li>
+                            <li>
+                                <a href="#!">Link 3</a>
+                            </li>
+                            <li>
+                                <a href="#!">Link 4</a>
+                            </li>
+                        </ul>
+
+                    </div>
+                    <!-- Grid column -->
+
+                </div>
+                <!-- Grid row -->
+
+            </div>
+            <!-- Footer Links -->
+
+            <!-- Copyright -->
+            <div class="footer-copyright text-center py-3">© 2019 Copyright:
+                <a href=""> Ito-Hajime.com</a>
+            </div>
+            <!-- Copyright -->
+
+        </footer>
+        <!-- Footer -->
+
     </div>
-
-    <h3>投稿一覧</h3>
-    <div class="container">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>投稿者</th>
-                    <th>メッセージ</th>
-                    <th>登校日</th>
-                </tr>
-            </thead>
-            <tbody id="posttablebody">
-            </tbody>
-        </table>
-    </div>
-
-    <h3>他のメンバー</h3>
-    <div class="row" id="rowCard"> </div><!-- /.row -->
-
-
-    <p>Make a Group</p>
-    <p>Group Name</p>
-    <input type="text" id="Groupname" />
-    <button onclick="Group.create(document.getElementById('Groupname').value)">make a Group</button>
-
-    <p>get currentGroupKey</p>
-
-    <div id="currentGroupKey"></div>
-
-    <p>join Group</p>
-
-    <input type="text" id="GroupID">
-
-    <button onclick="Group.join(document.getElementById('GroupID').value)">join this Group</button>
-
-    <p>--------------------------</p>
-
-    <div>
-        <p>PUT MESSAGE</p>
-        <input type="text" id="message" />
-
-        <button onclick="Post.set(document.getElementById('message').value)">send message</button>
-    </div>
-
-    <div>
-        <p>PUT Profile</p>
-        <p>username</p>
-        <input type="text" id="username" />
-        <p>pic num</p>
-        <input type="text" id="pic" />
-        <button onclick="Account.setProfile(document.getElementById('username').value, 
-                                            document.getElementById('pic').value)">send profile</button>
-    </div>
-
-    <div>
-        <p>MAKE A PROJECT</p>
-        <p>TITLE</p>
-        <input type="text" id="ProjectTitle" />
-        <p>CONTENT MESSAGE</p>
-        <input type="text" id="ProjectContent" />
-        <p>RECRUIT MESSAGE</p>
-        <input type="text" id="ProjectRecruit" />
-        <p>DENSITY</p>
-        <input type="text" id="ProjectDensity" />
-        <p>PERIOD</p>
-        <input type="text" id="ProjectPeriod" />
-
-        <button onclick="Project.create((document.getElementById('ProjectTitle').value),
-                                        (document.getElementById('ProjectContent').value),
-                                        (document.getElementById('ProjectRecruit').value),
-                                        (document.getElementById('ProjectDensity').value),
-                                        (document.getElementById('ProjectPeriod').value))
-                                         ">make a Project</button>
-
-    </div>
-
-
     <script>
 
         let createTable = (value) => {
             let btn = document.createElement('button')
+            btn.className = 'btn btn-danger rounded-pill'
             btn.type = 'button'
             btn.onclick = function () {
                 //onclick function
-                alert(value.title + ' : ' + value.key)
-                Project.private_delete(value.key, Project)
-                Project.update()
+                let a = new Promise(function (resolve, reject) {
+                    try {
+                        alert(value.title + ' : ' + value.key)
+                        Project.private_delete(value.key, Project)
+                        Project.update()
+                        resolve()
+                    } catch (e) { reject(e) }
+                })
+                a.then(function () {
+                    location.reload()
+                })
             }
             btn.textContent = 'Delete'
             let tr_element = document.createElement('tr')
+            tr_element.className = 'list-group-item-light'
             let parent_object = document.getElementById('tablebody')
             tr_element.innerHTML = '<tr><th>' + value.title + '</th></tr><tr><td>' + value.startdate + '</td></tr>'
                 + '<tr><td id="' + value.key + 'AAAA">' + '</td></tr>'
@@ -547,6 +787,7 @@
 
         let createPostTable = (value) => {
             let tr_element = document.createElement('tr')
+            tr_element.className = 'list-group-item-light'
             let parent_object = document.getElementById('posttablebody')
             tr_element.innerHTML = '<tr><th>' + value.owner + '</th></tr><tr><td>' + value.message + '</td></tr>'
                 + '<tr><td>' + value.date + '</td></tr>'
@@ -554,20 +795,17 @@
         }
 
         let Mycard = () => {
-
             database.ref('Account/' + uid + '/profile').once('value').then(function (snapshot) {
                 let parent_object = document.getElementById('Mycard')
-                let cardrow = document.createElement('div')
-                cardrow.className = 'row'
 
-                let card = document.createElement('div')
-                card.className = 'col-sm-3 col-md-3'
+                let cardcol = document.createElement('div')
+                cardcol.className = 'col-md-4'
 
-                let cardimg = document.createElement('div')
-                cardimg.className = 'card img-thumbnail'
+                let cardcol1 = document.createElement('div')
+                cardcol1.className = 'col-md-8'
 
                 let cardimgtop = document.createElement('img')
-                cardimgtop.className = 'card-img-top'
+                cardimgtop.className = 'card-img'
                 if (snapshot.val().pic == 0)
                     cardimgtop.src = '../img/akko.png'
                 else if (snapshot.val().pic == 1)
@@ -581,7 +819,7 @@
                 cardimgtop.alt = 'Account'
 
                 let cardbody = document.createElement('div')
-                cardbody.className = 'card-body px-1 py-1'
+                cardbody.className = 'card-body  bg-light border-primary'
 
                 let cardtitle = document.createElement('h5')
                 cardtitle.className = 'card-title'
@@ -589,12 +827,11 @@
 
                 let cardtext = document.createElement('p')
                 cardtext.className = 'card-text'
-                let text = document.createTextNode('自己紹介文')
+                let text = document.createTextNode(snapshot.val().bio)
                 cardtext.appendChild(text)
 
-                let a1 = parent_object.appendChild(card).appendChild(cardimg)
-                a1.appendChild(cardimgtop)
-                let a2 = parent_object.appendChild(card).appendChild(cardimg).appendChild(cardbody)
+                parent_object.appendChild(cardcol).appendChild(cardimgtop)
+                let a2 = parent_object.appendChild(cardcol1).appendChild(cardbody)
                 a2.appendChild(cardtitle)
                 a2.appendChild(cardtext)
             })
@@ -607,11 +844,12 @@
             for (let p of pids) {
                 database.ref('Group/' + currentGroupKey + '/profile/' + p).once('value').then(function (snapshot) {
                     let parent_object = document.getElementById('rowCard')
+
                     let cardrow = document.createElement('div')
                     cardrow.className = 'row'
 
                     let card = document.createElement('div')
-                    card.className = 'col-sm-2 col-md-2'
+                    card.className = 'col-sm-1 col-md-2'
 
                     let cardimg = document.createElement('div')
                     cardimg.className = 'card img-thumbnail'
@@ -631,7 +869,7 @@
                     cardimgtop.alt = 'Account'
 
                     let cardbody = document.createElement('div')
-                    cardbody.className = 'card-body px-1 py-1'
+                    cardbody.className = 'card-body px-1 py-1 bg-light'
 
                     let cardtitle = document.createElement('h5')
                     cardtitle.className = 'card-title'
@@ -647,7 +885,7 @@
                     btn.className = 'mb-0'
 
                     let btn0 = document.createElement('a')
-                    btn0.className = 'btn btn-primary btn-sm'
+                    btn0.className = 'btn btn-primary btn-sm rounded-pill'
                     btn0.href = '#'
                     text = document.createTextNode('通知を送る')
                     btn0.onclick = function () {
@@ -664,11 +902,10 @@
                         alert(p + 'へ通知を送りました')
                     }
 
-
                     btn0.appendChild(text)
 
                     let btn1 = document.createElement('a')
-                    btn1.className = 'btn btn-secondary btn-sm'
+                    btn1.className = 'btn btn-secondary btn-sm rounded-pill'
                     btn1.href = '#'
                     text = document.createTextNode('見る')
                     btn1.appendChild(text)
@@ -677,7 +914,7 @@
                     a1.appendChild(cardimgtop)
                     let a2 = parent_object.appendChild(card).appendChild(cardimg).appendChild(cardbody)
                     a2.appendChild(cardtitle)
-                    a2.appendChild(cardtext)
+                    //a2.appendChild(cardtext)
                     a2.appendChild(btn).appendChild(btn0)
                     a2.appendChild(btn).appendChild(btn1)
 
@@ -685,63 +922,80 @@
             }
         }
 
-        let Init_func_currentGroupKey = (currentGroupKey) => {
-            let contentBlock1 = document.getElementById('currentGroupKey')
-            contentBlock1.insertAdjacentHTML('afterbegin', 'currentGroupKey :' + currentGroupKey)
-        }
-
-        const uid = sessionStorage.getItem('uid')//自分のuserID
-        let mypid//自分のpeerID
-        let Promise_mypid = new Promise(function (resolve, reject) {
-            try {
-                database.ref('Account/' + uid + '/profile/').on('value', function (snapshot) {
-                    mypid = snapshot.val().pid
-                    //isLogin()の処理を追加
-                    //document.addEventListener('DOMContentLoaded'...)ではpidをここで取得する前に実行されるので
-                    //新しいpidが生成されてしまう
-                    if (uid == undefined) alert('you did not login now')
-                    else {
-                        if (mypid == undefined) {
-                            //First time only fired. 初期化時の処理
-                            let tmpname = 'nanashi'
-                            let defaultpic = 0
-                            //pid生成
-                            let mypid = database.ref('Profile/').push().key
-                            let Ref = database.ref('Account/' + uid + '/profile')
-                            Ref.update({
-                                username: tmpname,
-                                pic: defaultpic,
-                                pid: mypid,
-                                attendance: false
+        let Init_func_GroupKeys = () => {
+            let Ref = database.ref('Account/' + uid + '/group')
+            Ref.once('value').then(function (snapshot) {
+                let list = snapshot.val().groups
+                let _list = list.split(',')
+                for (let l of _list) if (l.length > 1) {
+                    Ref = database.ref('Group/' + l)
+                    Ref.once('value').then(function (snapshot) {
+                        let parent_object = document.getElementById('Select Group Nav')
+                        let btn1 = document.createElement('a')
+                        btn1.className = 'dropdown-item'
+                        btn1.href = '#'
+                        let text = document.createTextNode('Go:' + snapshot.val().groupname)
+                        btn1.appendChild(text)
+                        btn1.onclick = function () {
+                            let a = new Promise(function (resolve, reject) {
+                                try {
+                                    Group.join(l)
+                                    alert("移動します")
+                                    resolve()
+                                } catch (e) { reject(e) }
                             })
-
-                            Ref = database.ref('Profile/' + mypid)
-                            Ref.update({
-                                username: tmpname,
-                                pic: defaultpic,
-                                pid: mypid,
-                                attendance: false
-                            })
-                            //初期状態を確保することで読み取りからの書き込みを可能にする
-                            Ref = database.ref('Account/' + uid + '/group/')
-                            Ref.update({
-                                groups: ','
-                            })
-                            //初期状態を確保することで読み取りからの書き込みを可能にする
-                            Ref = database.ref('Account/' + uid + '/project')
-                            Ref.update({
-                                projects: ","
+                            a.then(function () {
+                                location.reload()
                             })
                         }
-                    }
-                    resolve()
-                    //リスナーをデタッチ
-                    database.ref('Account/' + uid + '/profile/').off(snapshot.val())
-                })
-            } catch (e) { reject(e) }
-        })
+                        parent_object.appendChild(btn1)
+                    })
+                }
+            })
+        }
 
-        Promise_mypid.then(function () {
+        let Init_func_firststep = () => {
+            //isLogin()の処理を追加
+            //document.addEventListener('DOMContentLoaded'...)ではpidをここで取得する前に実行されるので
+            //新しいpidが生成されてしまう
+            if (uid == undefined) alert('you did not login now')
+
+            if (mypid == undefined) {
+                //First time only fired. 初期化時の処理
+                mypid = database.ref('Profile/').push().key
+                let tmpname = 'nanashi'
+                let defaultpic = 0
+                //pid生成
+                let Ref = database.ref('Account/' + uid + '/profile')
+                Ref.update({
+                    username: tmpname,
+                    pic: defaultpic,
+                    pid: mypid,
+                    attendance: false
+                })
+
+                Ref = database.ref('Profile/' + mypid)
+                Ref.update({
+                    username: tmpname,
+                    pic: defaultpic,
+                    pid: mypid,
+                    attendance: false
+                })
+                //初期状態を確保することで読み取りからの書き込みを可能にする
+                Ref = database.ref('Account/' + uid + '/group/')
+                Ref.update({
+                    groups: ','
+                })
+                //初期状態を確保することで読み取りからの書き込みを可能にする
+                Ref = database.ref('Account/' + uid + '/project')
+                Ref.update({
+                    projects: ","
+                })
+
+            }
+        }
+
+        let Init_func_notice = () => {
             let Ref = database.ref('Notice/').orderByChild('owner').equalTo(mypid)
             Ref.on('child_added', function (snapshot) {
                 let notice = []
@@ -750,47 +1004,12 @@
                 notice.type = snapshot.val().type
                 notice.day = snapshot.val().day
                 alert(notice.from + 'から通知です :' + notice.day)
-                //let contentBlock = document.getElementById('notice')
-                //contentBlock.insertAdjacentHTML('afterbegin', notice.from)
                 database.ref('Notice/' + snapshot.val().selfkey).remove()
                 Ref.off(snapshot.val())
             })
-        })
+        }
 
-        let currentGroupKey//現在のGroupKey
-        let pids = []//peerのpid配列
-
-        let promise_currentGroupKey = new Promise(function (resolve, reject) {
-            try {
-                database.ref('Account/' + uid + '/profile/currentgroup').on('value', function (snapshot) {
-                    currentGroupKey = snapshot.val().groupkey
-                    resolve(currentGroupKey)
-                    database.ref('Account/' + uid + '/profile/currentgroup').off(snapshot.val())
-                })
-            } catch (e) { reject(e) }
-        })
-        promise_currentGroupKey.then(function (currentGroupKey) {
-            //////////////////////////////////////////////////
-            Init_func_currentGroupKey(currentGroupKey)
-            Mycard()
-            /////////////////////////////////////////////////
-            //peer pid get
-            let promise_pid = new Promise(function (resolve, reject) {
-                try {
-                    database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
-                        let pid = snapshot.val().pid
-                        if (pid != mypid) pids.push(pid)
-                        resolve()
-                        database.ref('Group/' + currentGroupKey + '/profile').off(snapshot.val())
-                    })
-                } catch (e) { reject(e) }
-            })
-            promise_pid.then(function () {
-                ///////////////////////////////////////////////////////////////////////////////////////                          
-                card(pids)
-                /////////////////////////////////////////////////////////////////////////////////////////////
-            })
-            //currentGroupKey取得とprofile自動書き込み
+        let Init_funcpromise_updateProfile = () => {
             let promise_profile = new Promise(function (resolve, reject) {
                 try {
                     let Ref = database.ref('Account/' + uid + '/profile/')
@@ -803,14 +1022,16 @@
                 } catch (e) { reject(e) }
             })
             promise_profile.then(function (value) {
-                Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid)
+                let Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid)
                 Ref.update({
                     username: value.name,
                     pic: value.pic,
                     pid: mypid
                 })
             })
+        }
 
+        let Init_funcpromise_getMyProject = () => {
             let promise_projectList = new Promise(function (resolve, reject) {
                 try {
                     let Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
@@ -845,7 +1066,9 @@
                     })
                 }
             })
-            ////////////////////////////////////////////////////////
+        }
+
+        let Init_func_getMyPost = () => {
             let Ref = database.ref('Group/' + currentGroupKey + '/post/').orderByChild('owner').equalTo(mypid)
             Ref.on('child_added', function (snapshot) {
                 let tmp = []
@@ -859,8 +1082,85 @@
                 createPostTable(tmp)
                 Ref.off(snapshot.val())
             })
-            ///////////////////////////////////////////////////////////
+        }
 
+        let uid
+        let mypid//自分のpeerID
+        let currentGroupKey//現在のGroupKey
+        let pids = []//peerのpid配列
+
+        let promise_uid = new Promise(function (resolve, reject) {
+            try {
+                uid = sessionStorage.getItem('uid')
+                resolve()
+            } catch (e) { reject(e) }
+        })
+
+        promise_uid.then(function () {
+
+            let promise_mypid = new Promise(function (resolve, reject) {
+                try {
+                    let promise_tmp = new Promise(function (resolve, reject) {
+                        try {
+                            database.ref('Account/' + uid + '/profile/').update({
+                                tmp: 'tmp'
+                            })
+                            resolve()
+                        } catch (e) { reject(e) }
+                    })
+
+                    promise_tmp.then(function () {
+                        database.ref('Account/' + uid + '/profile').on('value', function (snapshot) {
+                            mypid = snapshot.val().pid
+                            resolve()
+                            //リスナーをデタッチ
+                            database.ref('Account/' + uid + '/profile').off(snapshot.val())
+                        })
+                    })
+                } catch (e) { reject(e) }
+            })
+
+            promise_mypid.then(function () {
+                Init_func_firststep()
+                Init_func_notice()
+            })
+
+            let promise_currentGroupKey = new Promise(function (resolve, reject) {
+                try {
+                    database.ref('Account/' + uid + '/profile/currentgroup').on('value', function (snapshot) {
+                        currentGroupKey = snapshot.val().groupkey
+                        resolve()
+                        database.ref('Account/' + uid + '/profile/currentgroup').off(snapshot.val())
+                    })
+                } catch (e) { reject(e) }
+            })
+
+            promise_currentGroupKey.then(function () {
+                //////////////////////////////////////////////////
+                Init_func_GroupKeys()
+                Mycard()
+                Init_funcpromise_updateProfile()
+                Init_funcpromise_getMyProject()
+                Init_func_getMyPost()
+                /////////////////////////////////////////////////
+                //peer pid get
+                let promise_pids = new Promise(function (resolve, reject) {
+                    try {
+                        database.ref('Group/' + currentGroupKey + '/profile').on('child_added', function (snapshot) {
+                            let pid = snapshot.val().pid
+                            if (pid != mypid) pids.push(pid)
+                            resolve()
+                            database.ref('Group/' + currentGroupKey + '/profile').off(snapshot.val())
+                        })
+                    } catch (e) { reject(e) }
+                })
+                promise_pids.then(function () {
+                    ///////////////////////////////////////////////////////////////////////////////////////                          
+                    card(pids)
+                    /////////////////////////////////////////////////////////////////////////////////////////////
+                })
+
+            })
         })
 
         //////////////////////////////////////////////////////
@@ -900,6 +1200,7 @@
             return ToDate;
         }
     </script>
+
 </body>
 
 </html>

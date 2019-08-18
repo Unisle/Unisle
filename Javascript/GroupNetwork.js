@@ -1,3 +1,4 @@
+
 class GroupNetwork {
     constructor() {
 
@@ -41,11 +42,11 @@ class GroupNetwork {
             let list = []
             let _list = ''
             groups = snapshot.val().groups
-            if (groups === '') groups = groupkey + ','
+            if (groups == '') groups = groupkey + ','
             else groups += groupkey + ','
             list = groups.split(',')
-            for (let li of list) if (li.length > 1) _list += li + ','
-
+            for (let li of list) if (li.length > 1 && li != groupkey) _list += li + ','
+            _list += groupkey + ','
             Ref = database.ref('Account/' + uid + '/group/')
             Ref.update({
                 groups: _list
@@ -54,6 +55,21 @@ class GroupNetwork {
             Ref = database.ref('Account/' + uid + '/profile' + '/currentgroup')
             Ref.update({
                 groupkey: groupkey
+            })
+
+            Ref = database.ref('Account/' + uid + '/profile')
+            Ref.once('value').then(function (snapshot) {
+                let name = snapshot.val().username
+                let pic = snapshot.val().pic
+                let bio = snapshot.val().bio
+                let Ref = database.ref('Group/' + groupkey + '/profile/' + mypid)
+                Ref.update({
+                    username: name,
+                    pic: pic,
+                    bio: bio,
+                    pid: mypid
+                })
+
             })
 
         })
