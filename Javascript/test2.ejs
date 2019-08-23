@@ -4,7 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Class TESTだよ</title>
+    <title>Unisle TEST SITE</title>
 </head>
 
 <body>
@@ -18,13 +18,6 @@
     <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-functions.js"></script>
 
-    <script src="../network/AccountNetwork.js"></script>
-    <script src="../network/GroupNetwork.js"></script>
-    <script src="../network/NoticeNetwork.js"></script>
-    <script src="../network/PostNetwork.js"></script>
-    <script src="../network/ScheduleNetwork.js"></script>
-
-
     <!--Bootstrap-->
     <!-- BootstrapのCSS読み込み -->
     <link href="../css/bootstrap.min.css" rel="stylesheet">
@@ -32,6 +25,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- BootstrapのJS読み込み -->
     <script src="../js/bootstrap.min.js"></script>
+
+    <script src="../network/AccountNetwork.js"></script>
+    <script src="../network/GroupNetwork.js"></script>
+    <script src="../network/NoticeNetwork.js"></script>
+    <script src="../network/PostNetwork.js"></script>
+    <script src="../network/ScheduleNetwork.js"></script>
+
     <script>
         // Firebaseの初期化
         var config = {
@@ -43,6 +43,22 @@
         database = firebase.database()
 
     </script>
+
+
+    <!-- ココにコンテンツを入れる -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+    <link rel="stylesheet" href="../harada/style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.js"></script>
+
+
 
     <script>
 
@@ -171,6 +187,7 @@
                         Ref.once('value').then(function (snapshot) {
                             projects = snapshot.val().projects
                         })
+                        Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
                         Ref.update({
                             projects: projects + key + ','
                         })
@@ -209,35 +226,46 @@
                             projects: _list
                         })
                         Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
-                        Ref.once('value').then(function (snapshot) {
-                            projects = snapshot.val().projects
-                        })
-                        list = []
-                        _list = ''
-                        list = projects.split(',')
-                        for (let li of list) {
-                            if (li !== key && li.length > 1)
-                                _list += li + ','
-                        }
-                        Ref.update({
-                            projects: _list
+
+                        let promise_projects = new Promise(function (resolve, reject) {
+                            try {
+                                Ref.once('value').then(function (snapshot) {
+                                    projects = snapshot.val().projects
+                                    resolve()
+                                })
+                            } catch (e) { reject(e) }
                         })
 
-                        Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
-                        Ref.once('value').then(function (snapshot) {
-                            let member = snapshot.val().member
+                        promise_projects.then(function () {
                             list = []
-                            list = member.split(',')
                             _list = ''
+                            list = projects.split(',')
                             for (let li of list) {
-                                if (li !== mypid && li.length > 1)
+                                if (li != key && li.length > 1)
                                     _list += li + ','
                             }
-                            Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
+                            Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
                             Ref.update({
-                                member: _list
+                                projects: _list
+                            })
+
+                            Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
+                            Ref.once('value').then(function (snapshot) {
+                                let member = snapshot.val().member
+                                list = []
+                                list = member.split(',')
+                                _list = ''
+                                for (let li of list) {
+                                    if (li !== mypid && li.length > 1)
+                                        _list += li + ','
+                                }
+                                Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
+                                Ref.update({
+                                    member: _list
+                                })
                             })
                         })
+
                     } else alert("参加していません")
                 })
             }
@@ -259,14 +287,12 @@
 
                 let promise = new Promise(function (resolve, reject) {
                     try {
-                        let Ref = database.ref('Group/' + currentGroupKey + '/project/')
+                        let Ref = database.ref('Group/' + currentGroupKey + '/project')
                         Ref.once('value').then(function (snapshot) {
                             let project_list = snapshot.val().project_list
                             let list = project_list.split(',')
                             let _list = ''
-                            for (let li of list) {
-                                if (li !== key && li.length > 1) _list += li + ','
-                            }
+                            for (let li of list) if (li != key && li.length > 2) _list += li + ','
                             resolve(_list)
                         })
                     } catch (e) { reject(e) }
@@ -327,7 +353,6 @@
                     parent_object.appendChild(tr_element)
                     let pb = document.getElementById(value.key + 'AAAA')
                     pb.appendChild(btn)
-                    //.insertBefore(btn, tr_element.nextSibling)
                 }
 
                 let List = new Promise(function (resolve, reject) {
@@ -423,221 +448,328 @@
         const Project = new ProjectNetwork()
         const Group = new GroupNetwork()
         const Notice = new NoticeNetwork()
+
     </script>
-    <div class="container-fluid">
-        <!-- ココにコンテンツを入れる -->
 
 
-        <nav class="navbar navbar-expand-sm navbar-light bg-light mt-2 mb-3 sticky-top">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav4"
-                aria-controls="navbarNav4" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <a class="navbar-brand" href="#">Unisle</a>
-            <div class="collapse navbar-collapse">
+    <nav class="navbar navbar-expand-sm navbar-light bg-light mt-0 mb-0 sticky-top">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav4"
+            aria-controls="navbarNav4" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Unisle</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">ユーザー設定</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">スケジュール</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        グループ選択
+                    </a>
+                    <div id="SelectGroupNav" class="dropdown-menu" aria-labelledby="dropdown1"></div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="wrapper d-flex">
+        <div class="sideMenu bg-mattBlackLight">
+            <div class="sidevar">
                 <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            グループ選択
-                        </a>
-
-                        <div id="Select Group Nav" class="dropdown-menu" aria-labelledby="dropdown1">
-
-                        </div>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link px-2"><i class="zmdi zmdi-view-dashboard icon"></i><span
+                                class="text">Home</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">ユーザー設定</a>
+                        <a href="#" class="nav-link px-2"><i class="zmdi zmdi-account icon"></i><span class="text">User
+                                Profile</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">スケジュール</a>
+                        <a href="#" class="nav-link px-2"><i class="zmdi zmdi-chart icon"></i><span
+                                class="text">Charts</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link px-2"><i class="zmdi zmdi-devices icon"></i><span
+                                class="text">Slack</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link sideMenuToggler px-2"><i
+                                class="zmdi zmdi-format-list-bulleted icon"></i><span class="text">Resize</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link px-2"><i class="zmdi zmdi-settings icon"></i><span
+                                class="text">Settings</span></a>
                     </li>
                 </ul>
             </div>
-        </nav>
-
-        <div class="jumbotron jumbotron-fluid">
-            <div class="container  text-white">
-                <h1 class="display-2">Welcome to Unisle!</h1>
-                <script>
-                //getElementById('display-3').insertAdjacentHTML('beforeend', ' on ' + currentGroupKey)
-                </script>
-                <p class="lead">Unisle helps your works in a team.</p>
-                <hr class="my-1">
-                <p>Seek and Learn and Practice</p>
-                <a class="btn btn-secondary btn-lg" href="#" role="button">Learn more</a>
-            </div>
         </div>
+        <!--div-->
 
-        <style type="text/css">
-            /*ここに調整CSS記述*/
-            .jumbotron {
-                background: url(../img/top.jpg) center no-repeat;
-                background-size: cover;
-            }
-
-            .card-img-top {
-                width: 100%;
-                height: 15vw;
-                object-fit: cover;
-            }
-
-            .card-img {
-                width: 100%;
-                height: 15vw;
-                object-fit: cover;
-            }
-
-            body {
-                /* 画像ファイルの指定 */
-                /*background-image: url(../img/back.jpg);*/
-
-                /* 画像を常に天地左右の中央に配置 */
-                background-position: center center;
-
-                /* 画像をタイル状に繰り返し表示しない */
-                background-repeat: no-repeat;
-
-                /* コンテンツの高さが画像の高さより大きい時、動かないように固定 */
-                background-attachment: fixed;
-
-                /* 表示するコンテナの大きさに基づいて、背景画像を調整 */
-                background-size: cover;
-
-                /* 背景画像が読み込まれる前に表示される背景のカラー */
-                background-color: #F5F1E9;
-            }
-        </style>
-
-        <h3>あなたのアカウント</h3>
-        <div class="card mb-3" style="max-width: 700px;">
-            <div class="row no-gutters" id="Mycard"></div>
-        </div>
+        <div class="content">
+            <main>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 p-0">
+                            <div class="jumbotron jumbotron-fluid m-0">
+                                <div class="container  text-white">
+                                    <h1 class="display-2">Welcome to Unisle!</h1>
+                                    <p class="lead">Unisle helps your works in a team.</p>
+                                    <hr class="my-1">
+                                    <p>Seek and Learn and Practice</p>
+                                    <a class="btn btn-secondary btn-lg" href="#" role="button">Learn more</a>
+                                </div>
+                            </div>
+                        </div>
 
 
-        <h3>プロジェクト一覧</h3>
-        <div class="container">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>プロジェクト名</th>
-                        <th>作成日</th>
-                        <th>編集</th>
-                    </tr>
-                </thead>
-                <tbody id="tablebody">
-                </tbody>
-            </table>
-        </div>
+                        <style type="text/css">
+                            /*ここに調整CSS記述*/
+                            .jumbotron {
+                                background: url(../img/top4.jpg) center no-repeat;
+                                background-size: cover;
+                            }
 
-        <h3>投稿一覧</h3>
-        <div class="container">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>投稿者</th>
-                        <th>メッセージ</th>
-                        <th>登校日</th>
-                    </tr>
-                </thead>
-                <tbody id="posttablebody">
-                </tbody>
-            </table>
-        </div>
+                            .card-img-top {
+                                width: 100%;
+                                height: 7vw;
+                                object-fit: cover;
+                            }
 
-        <h3>他のメンバー</h3>
-        <div class="row" id="rowCard"> </div><!-- /.row -->
+                            .card-img {
+                                width: 100%;
+                                height: 13vw;
+                                object-fit: cover;
+                            }
 
-        <h3>ツール一覧</h3>
+                            body {
+                                /* 画像ファイルの指定 */
+                                /*background-image: url(../img/back.jpg);*/
 
-        <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="item1-tab" data-toggle="tab" href="#item1" role="tab"
-                    aria-controls="item1" aria-selected="true">Set Profile</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="item2-tab" data-toggle="tab" href="#item2" role="tab" aria-controls="item2"
-                    aria-selected="false">Send Post</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="item3-tab" data-toggle="tab" href="#item3" role="tab" aria-controls="item3"
-                    aria-selected="false">Create Project</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="item4-tab" data-toggle="tab" href="#item4" role="tab" aria-controls="item4"
-                    aria-selected="false">Create Group</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="item5-tab" data-toggle="tab" href="#item5" role="tab" aria-controls="item5"
-                    aria-selected="false">Select Group</a>
-            </li>
-        </ul>
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="item1" role="tabpanel" aria-labelledby="item1-tab">
-                <h6>Set Your Profile :)</h6>
-                <div class="form-group">
-                    <label for="name for profile">Name:</label>
-                    <input type="text" id="name for profile" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="pic for profile">Picture:</label>
-                    <select id="pic for profile" class="custom-select">
-                        <option>Akko0</option>
-                        <option>Akko1</option>
-                        <option>Sucy0</option>
-                        <option>Sucy1</option>
-                        <option>Diana0</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="bio for profile">Bio</label>
-                    <textarea id="bio for profile" class="form-control"></textarea>
-                </div>
-                <button class="btn btn-primary rounded-pill" onclick="
+                                /* 画像を常に天地左右の中央に配置 */
+                                background-position: center center;
+
+                                /* 画像をタイル状に繰り返し表示しない */
+                                background-repeat: no-repeat;
+
+                                /* コンテンツの高さが画像の高さより大きい時、動かないように固定 */
+                                background-attachment: fixed;
+
+                                /* 表示するコンテナの大きさに基づいて、背景画像を調整 */
+                                background-size: cover;
+
+                                /* 背景画像が読み込まれる前に表示される背景のカラー */
+                                background-color: #f8f9ee;
+                            }
+                        </style>
+                        <div class="container-fluid bg-light m-5">
+                            <div class="row">
+                                <div class="col-5">
+                                    <div class="card">
+                                        <div class="card-header text-center font-weight-bold" id="headerMyAccount">My
+                                            Account</div>
+                                        <div class="card mb-0" style="max-width: 700px;">
+                                            <div class="row no-gutters" id="Mycard"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-7">
+                                    <div class="card">
+                                        <div class="card-header text-center font-weight-bold">Peer</div>
+                                        <div id="carousel-card mb-0" class="carousel slide">
+                                            <ol class="carousel-indicators">
+                                                <!--ここもDOM操作する必要がある-->
+                                                <li data-target="#carousel-card" data-slide-to="0" class="active"></li>
+                                                <li data-target="#carousel-card" data-slide-to="1"></li>
+                                                <li data-target="#carousel-card" data-slide-to="2"></li>
+                                            </ol>
+                                            <div class="carousel-inner">
+                                                <div class="carousel-item active">
+                                                    <div class="row" id="rowCard"> </div><!-- /.row -->
+                                                </div>
+                                            </div>
+                                            <a class="carousel-control-prev" href="#carousel-card" role="button"
+                                                data-slide="prev">
+                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                <span class="sr-only">Previous</span>
+                                            </a>
+                                            <a class="carousel-control-next" href="#carousel-card" role="button"
+                                                data-slide="next">
+                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                <span class="sr-only">Next</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <style>
+                            .carousel-control-next,
+                            .carousel-control-prev {
+                                width: 5%;
+                                background-color: #d0cc5b;
+                            }
+                        </style>
+
+
+                        <div class="container-fluid bg-light ml-5 mr-5 mb-5">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card overflow-auto" style="max-height: 20rem; max-width: 33rem;">
+                                        <div class="card-header text-center font-weight-bold">Project</div>
+                                        <table class="table mb-0 table-striped table-bordered table-hover">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>プロジェクト名</th>
+                                                    <th>作成日</th>
+                                                    <th>編集</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tablebody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card overflow-auto" style="max-height: 20rem; max-width: 33rem;">
+                                        <div class="card-header text-center font-weight-bold">MyPost</div>
+                                        <table class="table mb-md-0 table-striped table-bordered table-hover">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>メッセージ</th>
+                                                    <th>登校日</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="posttablebody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-12 col-mb-6">
+                            <div class="container-fluid bg-light">
+                                <div class="col">
+                                    <div class="card overflow-auto" style="max-height: 20rem;">
+                                        <div class="card-header text-center font-weight-bold">Peer's Post</div>
+                                        <table class="table table-striped">
+                                            <thead class="thead-light table-bordered">
+                                                <tr>
+                                                    <th>投稿者</th>
+                                                    <th>メッセージ</th>
+                                                    <th>登校日</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="peerposttablebody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-12 col-mb-6 mt-5">
+
+                            <h3>Tool</h3>
+
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="item1-tab" data-toggle="tab" href="#item1" role="tab"
+                                        aria-controls="item1" aria-selected="true">Set Profile</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="item2-tab" data-toggle="tab" href="#item2" role="tab"
+                                        aria-controls="item2" aria-selected="false">Send Post</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="item3-tab" data-toggle="tab" href="#item3" role="tab"
+                                        aria-controls="item3" aria-selected="false">Create
+                                        Project</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="item4-tab" data-toggle="tab" href="#item4" role="tab"
+                                        aria-controls="item4" aria-selected="false">Create Group</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="item5-tab" data-toggle="tab" href="#item5" role="tab"
+                                        aria-controls="item5" aria-selected="false">Select Group</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content rounded">
+                                <div class="tab-pane fade show active" id="item1" role="tabpanel"
+                                    aria-labelledby="item1-tab">
+                                    <h6>Set Your Profile :)</h6>
+                                    <div class="form-group">
+                                        <label for="name for profile">Name:</label>
+                                        <input type="text" id="name for profile" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pic for profile">Picture:</label>
+                                        <select id="pic for profile" class="custom-select">
+                                            <option>Akko0</option>
+                                            <option>Akko1</option>
+                                            <option>Sucy0</option>
+                                            <option>Sucy1</option>
+                                            <option>Diana0</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bio for profile">Bio</label>
+                                        <textarea id="bio for profile" class="form-control"></textarea>
+                                    </div>
+                                    <button class="btn btn-primary rounded-pill" onclick="
                                                 let c = currentGroupKey;
                                                 if(c == undefined) c='1';
                                                 Account.setProfile(document.getElementById('name for profile').value, 
                                                 document.getElementById('pic for profile').value,
                                                 document.getElementById('bio for profile').value,
                                                  c); location.reload()">Send
-                </button>
-            </div>
-            <div class="tab-pane fade" id="item2" role="tabpanel" aria-labelledby="item2-tab">
-                <h6>Send Great Post :)</h6>
-                <div class="form-group">
-                    <label for="message for post">Message:</label>
-                    <textarea id="message for post" class="form-control"></textarea>
-                    <button class="btn btn-primary rounded-pill"
-                        onclick="Post.set(document.getElementById('message for post').value)">Send</button>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="item3" role="tabpanel" aria-labelledby="item3-tab">
-                <h6>Create Big Project :)</h6>
-                <div class="form-group">
-                    <label for="title for project">Title:</label>
-                    <input type="text" id="title for project" class="form-control">
-                </div>
+                                    </button>
+                                </div>
+                                <div class="tab-pane fade" id="item2" role="tabpanel" aria-labelledby="item2-tab">
+                                    <h6>Send Great Post :)</h6>
+                                    <div class="form-group">
+                                        <label for="message for post">Message:</label>
+                                        <textarea id="message for post" class="form-control"></textarea>
+                                        <button class="btn btn-primary rounded-pill"
+                                            onclick="Post.set(document.getElementById('message for post').value)">Send</button>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="item3" role="tabpanel" aria-labelledby="item3-tab">
+                                    <h6>Create Big Project :)</h6>
+                                    <div class="form-group">
+                                        <label for="title for project">Title:</label>
+                                        <input type="text" id="title for project" class="form-control">
+                                    </div>
 
-                <div class="form-group">
-                    <label for="conent for project">Content:</label>
-                    <textarea id="content for project" class="form-control"></textarea>
-                </div>
+                                    <div class="form-group">
+                                        <label for="conent for project">Content:</label>
+                                        <textarea id="content for project" class="form-control"></textarea>
+                                    </div>
 
-                <div class="form-group">
-                    <label for="recruit for project">Recruit:</label>
-                    <textarea id="recruit for project" class="form-control"></textarea>
-                </div>
+                                    <div class="form-group">
+                                        <label for="recruit for project">Recruit:</label>
+                                        <textarea id="recruit for project" class="form-control"></textarea>
+                                    </div>
 
-                <div class="form-group">
-                    <label for="density for project">Density:</label>
-                    <input type="text" id="density for project" class="form-control">
-                </div>
+                                    <div class="form-group">
+                                        <label for="density for project">Density:</label>
+                                        <input type="text" id="density for project" class="form-control">
+                                    </div>
 
-                <div class="form-group">
-                    <label for="period for project">Period:</label>
-                    <input type="text" id="period for project" class="form-control">
-                </div>
-                <button class="btn btn-primary rounded-pill" onclick="Project.create(
+                                    <div class="form-group">
+                                        <label for="period for project">Period:</label>
+                                        <input type="text" id="period for project" class="form-control">
+                                    </div>
+                                    <button class="btn btn-primary rounded-pill" onclick="Project.create(
                                         (document.getElementById('title for project').value),
                                         (document.getElementById('content for project').value),
                                         (document.getElementById('recruit for project').value),
@@ -645,118 +777,123 @@
                                         (document.getElementById('period for project').value));
                                         location.reload();
                                          ">Create</button>
-            </div>
-            <div class="tab-pane fade" id="item4" role="tabpanel" aria-labelledby="item4-tab">
-                <h6>Create Charming Group :)</h6>
-                <div class="form-group">
-                    <label for="name for group">Group Name:</label>
-                    <input type="text" id="name for group" class="form-control">
-                    <button class="btn btn-primary rounded-pill" onclick="Group.create(document.getElementById('name for group').value);
+                                </div>
+                                <div class="tab-pane fade" id="item4" role="tabpanel" aria-labelledby="item4-tab">
+                                    <h6>Create Charming Group :)</h6>
+                                    <div class="form-group">
+                                        <label for="name for group">Group Name:</label>
+                                        <input type="text" id="name for group" class="form-control">
+                                        <button class="btn btn-primary rounded-pill" onclick="Group.create(document.getElementById('name for group').value);
                         location.reload()">Create</button>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="item5" role="tabpanel" aria-labelledby="item5-tab">
-                <h6>Join Awesome Group :)</h6>
-                <div class="form-group">
-                    <label for="id for group">Group ID:</label>
-                    <input type="text" id="id for group" class="form-control">
-                    <button class="btn btn-primary rounded-pill" onclick="Group.join(document.getElementById('id for group').value);
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="item5" role="tabpanel" aria-labelledby="item5-tab">
+                                    <h6>Join Awesome Group :)</h6>
+                                    <div class="form-group">
+                                        <label for="id for group">Group ID:</label>
+                                        <input type="text" id="id for group" class="form-control">
+                                        <button class="btn btn-primary rounded-pill" onclick="Group.join(document.getElementById('id for group').value);
                         location.reload()">Join</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <footer class="page-footer font-small blue pt-4 mt-5">
+
+                <!-- Footer Links -->
+                <div class="container-fluid text-center text-md-left">
+
+                    <!-- Grid row -->
+                    <div class="row">
+
+                        <!-- Grid column -->
+                        <div class="col-md-6 mt-md-0 mt-3">
+
+                            <!-- Content -->
+                            <h5 class="text-uppercase">♠UNISLE FOR YOU♠</h5>
+                            <p>my contacts</p>
+                            <p>Ito Hajime</p>
+                            <p>email: b1018194@fun.ac.jp</p>
+
+                        </div>
+                        <!-- Grid column -->
+
+                        <hr class="clearfix w-100 d-md-none pb-3">
+
+                        <!-- Grid column -->
+                        <div class="col-md-3 mb-md-0 mb-3">
+
+                            <!-- Links -->
+                            <h5 class="text-uppercase">Links</h5>
+
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a href="#!">Link 1</a>
+                                </li>
+                                <li>
+                                    <a href="#!">Link 2</a>
+                                </li>
+                                <li>
+                                    <a href="#!">Link 3</a>
+                                </li>
+                                <li>
+                                    <a href="#!">Link 4</a>
+                                </li>
+                            </ul>
+
+                        </div>
+                        <!-- Grid column -->
+
+                        <!-- Grid column -->
+                        <div class="col-md-3 mb-md-0 mb-3">
+
+                            <!-- Links -->
+                            <h5 class="text-uppercase">Links</h5>
+
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a href="#!">Link 1</a>
+                                </li>
+                                <li>
+                                    <a href="#!">Link 2</a>
+                                </li>
+                                <li>
+                                    <a href="#!">Link 3</a>
+                                </li>
+                                <li>
+                                    <a href="#!">Link 4</a>
+                                </li>
+                            </ul>
+
+                        </div>
+                        <!-- Grid column -->
+
+                    </div>
+                    <!-- Grid row -->
 
                 </div>
-            </div>
+                <!-- Footer Links -->
+
+                <!-- Copyright -->
+                <div class="footer-copyright text-center py-3">© 2019 Copyright:
+                    <a href=""> Ito-Hajime.com</a>
+                </div>
+                <!-- Copyright -->
+
+            </footer>
         </div>
-
-        <!-- Footer -->
-        <footer class="page-footer font-small blue pt-4">
-
-            <!-- Footer Links -->
-            <div class="container-fluid text-center text-md-left">
-
-                <!-- Grid row -->
-                <div class="row">
-
-                    <!-- Grid column -->
-                    <div class="col-md-6 mt-md-0 mt-3">
-
-                        <!-- Content -->
-                        <h5 class="text-uppercase">♠UNISLE FOR YOU♠</h5>
-                        <p>my contacts</p>
-                        <p>Ito Hajime</p>
-                        <p>email: b1018194@fun.ac.jp</p>
-
-                    </div>
-                    <!-- Grid column -->
-
-                    <hr class="clearfix w-100 d-md-none pb-3">
-
-                    <!-- Grid column -->
-                    <div class="col-md-3 mb-md-0 mb-3">
-
-                        <!-- Links -->
-                        <h5 class="text-uppercase">Links</h5>
-
-                        <ul class="list-unstyled">
-                            <li>
-                                <a href="#!">Link 1</a>
-                            </li>
-                            <li>
-                                <a href="#!">Link 2</a>
-                            </li>
-                            <li>
-                                <a href="#!">Link 3</a>
-                            </li>
-                            <li>
-                                <a href="#!">Link 4</a>
-                            </li>
-                        </ul>
-
-                    </div>
-                    <!-- Grid column -->
-
-                    <!-- Grid column -->
-                    <div class="col-md-3 mb-md-0 mb-3">
-
-                        <!-- Links -->
-                        <h5 class="text-uppercase">Links</h5>
-
-                        <ul class="list-unstyled">
-                            <li>
-                                <a href="#!">Link 1</a>
-                            </li>
-                            <li>
-                                <a href="#!">Link 2</a>
-                            </li>
-                            <li>
-                                <a href="#!">Link 3</a>
-                            </li>
-                            <li>
-                                <a href="#!">Link 4</a>
-                            </li>
-                        </ul>
-
-                    </div>
-                    <!-- Grid column -->
-
-                </div>
-                <!-- Grid row -->
-
-            </div>
-            <!-- Footer Links -->
-
-            <!-- Copyright -->
-            <div class="footer-copyright text-center py-3">© 2019 Copyright:
-                <a href=""> Ito-Hajime.com</a>
-            </div>
-            <!-- Copyright -->
-
-        </footer>
-        <!-- Footer -->
-
     </div>
+    <!-- Footer -->
+
+    <!-- Footer -->
+
     <script>
 
-        let createTable = (value) => {
+        let createTable = (value, isJoined) => {
             let btn = document.createElement('button')
             btn.className = 'btn btn-danger rounded-pill'
             btn.type = 'button'
@@ -766,7 +903,6 @@
                     try {
                         alert(value.title + ' : ' + value.key)
                         Project.private_delete(value.key, Project)
-                        Project.update()
                         resolve()
                     } catch (e) { reject(e) }
                 })
@@ -778,18 +914,36 @@
             let tr_element = document.createElement('tr')
             tr_element.className = 'list-group-item-light'
             let parent_object = document.getElementById('tablebody')
-            tr_element.innerHTML = '<tr><th>' + value.title + '</th></tr><tr><td>' + value.startdate + '</td></tr>'
-                + '<tr><td id="' + value.key + 'AAAA">' + '</td></tr>'
+
+            if (isJoined == true) {
+                //<p><a href="#" data-toggle="tooltip" title="これがツールチップです">リンク</a>の上にカーソルを合わせるかタッチして下さい。</p>
+                tr_element.innerHTML = '<tr><th data-toggle="tooltip" title="参加しています"><font color="#798949">' + value.title + '<font></th></tr><tr><td>' + value.startdate + '</td></tr>'
+                    + '<tr><td id="' + value.key + 'AAAA">' + '</td></tr>'
+            }
+            else {
+                tr_element.innerHTML = '<tr><th>' + value.title + '</th></tr><tr><td>' + value.startdate + '</td></tr>'
+                    + '<tr><td id="' + value.key + 'AAAA">' + '</td></tr>'
+            }
+
             parent_object.appendChild(tr_element)
             let pb = document.getElementById(value.key + 'AAAA')
             pb.appendChild(btn)
         }
 
-        let createPostTable = (value) => {
+        let createPostTable = (value, parentkey) => {
             let tr_element = document.createElement('tr')
             tr_element.className = 'list-group-item-light'
-            let parent_object = document.getElementById('posttablebody')
+            let parent_object = document.getElementById(parentkey)
             tr_element.innerHTML = '<tr><th>' + value.owner + '</th></tr><tr><td>' + value.message + '</td></tr>'
+                + '<tr><td>' + value.date + '</td></tr>'
+            parent_object.appendChild(tr_element)
+        }
+
+        let createMyPostTable = (value, parentkey) => {
+            let tr_element = document.createElement('tr')
+            tr_element.className = 'list-group-item-light'
+            let parent_object = document.getElementById(parentkey)
+            tr_element.innerHTML = '<tr><th>' + value.message + '</th></tr>'
                 + '<tr><td>' + value.date + '</td></tr>'
             parent_object.appendChild(tr_element)
         }
@@ -849,7 +1003,7 @@
                     cardrow.className = 'row'
 
                     let card = document.createElement('div')
-                    card.className = 'col-sm-1 col-md-2'
+                    card.className = 'col-4'
 
                     let cardimg = document.createElement('div')
                     cardimg.className = 'card img-thumbnail'
@@ -930,7 +1084,7 @@
                 for (let l of _list) if (l.length > 1) {
                     Ref = database.ref('Group/' + l)
                     Ref.once('value').then(function (snapshot) {
-                        let parent_object = document.getElementById('Select Group Nav')
+                        let parent_object = document.getElementById('SelectGroupNav')
                         let btn1 = document.createElement('a')
                         btn1.className = 'dropdown-item'
                         btn1.href = '#'
@@ -1049,7 +1203,7 @@
                 for (let key of list) {
                     let Ref = database.ref('Group/' + currentGroupKey + '/project/' + key)
                     Ref.once('value').then(function (snapshot) {
-                        if (snapshot.val().key.length > 1) {
+                        if (snapshot.val().key.length > 2) {
                             let project = []
                             project.key = snapshot.val().key
                             project.title = snapshot.val().title
@@ -1060,12 +1214,96 @@
                             project.period = snapshot.val().period
                             project.density = snapshot.val().densitys
                             ///////////////////
-                            createTable(project)
+                            createTable(project, true)
                             ///////////////////
                         }
                     })
                 }
             })
+        }
+
+        let Init_func_getAllProject = () => {
+
+            let getjoinedproject = (project) => {
+                return new Promise(function (resolve, reject) {
+                    try {
+                        let joined = []
+                        let Ref = database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project')
+                        Ref.once('value').then(function (snapshot) {
+                            let projects = snapshot.val().projects
+                            let list = []
+                            list = projects.split(',')
+                            for (let p of project)
+                                for (let li of list)
+                                    if (li.length > 2 && p == li) {
+                                        joined.push(p)
+                                        let Ref = database.ref('Group/' + currentGroupKey + '/project/' + p)
+                                        Ref.once('value').then(function (snapshot) {
+                                            if (snapshot.val().key.length > 2) {
+                                                let project = []
+                                                project.key = snapshot.val().key
+                                                project.title = snapshot.val().title
+                                                project.startdate = snapshot.val().startdate
+                                                project.member = snapshot.val().member
+                                                project.content = snapshot.val().content
+                                                project.recruit = snapshot.val().recruit
+                                                project.period = snapshot.val().period
+                                                project.density = snapshot.val().density
+                                                createTable(project, true)
+                                                database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project').off(snapshot.val())
+                                            }
+                                        })
+                                    }
+
+                            let notjoined = project
+
+                            for (let j of joined) {
+                                let idx = notjoined.indexOf(j)
+                                if (idx >= 0) notjoined.splice(idx, 1)
+                            }
+
+                            for (let li of notjoined) {
+                                let Ref = database.ref('Group/' + currentGroupKey + '/project/' + li)
+                                Ref.once('value').then(function (snapshot) {
+                                    if (snapshot.val().key.length > 2) {
+                                        let project = []
+                                        project.key = snapshot.val().key
+                                        project.title = snapshot.val().title
+                                        project.startdate = snapshot.val().startdate
+                                        project.member = snapshot.val().member
+                                        project.content = snapshot.val().content
+                                        project.recruit = snapshot.val().recruit
+                                        project.period = snapshot.val().period
+                                        project.density = snapshot.val().density
+                                        createTable(project, false)
+                                        database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project').off(snapshot.val())
+                                    }
+                                })
+                            }
+
+                        })
+                    } catch (e) { reject(e) }
+                })
+            }
+
+
+            let getproject = () => {
+                return new Promise(function (resolve, reject) {
+                    try {
+                        let Ref = database.ref('Group/' + currentGroupKey + '/project')
+                        Ref.once('value').then(function (snapshot) {
+                            let projects = snapshot.val().project_list
+                            let list = []
+                            list = projects.split(',')
+                            resolve(list)
+                            database.ref('Group/' + currentGroupKey + '/profile/' + mypid + '/project').off(snapshot.val())
+                        })
+                    } catch (e) { reject(e) }
+                })
+            }
+
+            getproject().then(getjoinedproject)
+
         }
 
         let Init_func_getMyPost = () => {
@@ -1076,10 +1314,32 @@
                 tmp.date = snapshot.val().date
                 tmp.selfkey = snapshot.val().selfkey
                 tmp.owner = snapshot.val().owner
-                tmp.sort(function (a, b) {
-                    return (a.date < b.date ? 1 : -1)
+                let Ref = database.ref('Group/' + currentGroupKey + '/profile/' + tmp.owner)
+                Ref.once('value').then(function (snapshot) {
+                    tmp.owner = snapshot.val().username
+                }).then(function () {
+                    createMyPostTable(tmp, 'posttablebody')
                 })
-                createPostTable(tmp)
+                Ref.off(snapshot.val())
+            })
+        }
+
+        let Init_func_getPeerPost = () => {
+            let Ref = database.ref('Group/' + currentGroupKey + '/post/')
+            Ref.on('child_added', function (snapshot) {
+                let tmp = []
+                tmp.message = snapshot.val().message
+                tmp.date = snapshot.val().date
+                tmp.selfkey = snapshot.val().selfkey
+                tmp.owner = snapshot.val().owner
+                if (tmp.owner != mypid) {
+                    let Ref = database.ref('Group/' + currentGroupKey + '/profile/' + tmp.owner)
+                    Ref.once('value').then(function (snapshot) {
+                        tmp.owner = snapshot.val().username
+                    }).then(function () {
+                        createPostTable(tmp, 'peerposttablebody')
+                    })
+                }
                 Ref.off(snapshot.val())
             })
         }
@@ -1140,8 +1400,10 @@
                 Init_func_GroupKeys()
                 Mycard()
                 Init_funcpromise_updateProfile()
-                Init_funcpromise_getMyProject()
+                //Init_funcpromise_getMyProject()
+                Init_func_getAllProject()
                 Init_func_getMyPost()
+                Init_func_getPeerPost()
                 /////////////////////////////////////////////////
                 //peer pid get
                 let promise_pids = new Promise(function (resolve, reject) {
@@ -1157,6 +1419,7 @@
                 promise_pids.then(function () {
                     ///////////////////////////////////////////////////////////////////////////////////////                          
                     card(pids)
+                    Project.update()
                     /////////////////////////////////////////////////////////////////////////////////////////////
                 })
 
@@ -1199,8 +1462,32 @@
 
             return ToDate;
         }
-    </script>
 
+        ///////////////////////////////////////////////////////////////////////
+        //harada
+        /////////////////////////////////////////
+
+        window.addEventListener('DOMContentLoaded', function () {
+
+        })
+
+        $(document).ready(function () {
+            var adjustSidebar = function () {
+                $(".sidebar").slimScroll({
+                    height: document.documentElement.clientHeight - $(".navbar").outerHeight()
+                });
+            };
+            adjustSidebar();
+
+            $(window).resize(function () {
+                adjustSidebar();
+            });
+
+            $(".sideMenuToggler").on("click", function () {
+                $(".wrapper").toggleClass("active");
+            });
+        });
+    </script>
 </body>
 
 </html>
