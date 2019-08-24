@@ -1,0 +1,112 @@
+@function rem($value) {
+    @return unquote(($value/1px)/16 + "rem");
+}
+
+$easeTime: 0.25s;
+$margin-top: 56px;
+
+$colors: (
+    "mattBlackLight": "#303337",
+    "mattBlackDark" : "#212121",
+    "mattGray" : "#ebebeb",
+    "mattRed" : "#ec6271",
+    "emerald-green" : "#68a08e"
+);
+
+@each $colorName, $colorValue in $colors {
+    .bg-#{$colorName} {
+        background-color: #{$colorValue};
+    }
+    .text-#{$colorName} {
+        color: #{$colorValue};
+    }
+}
+
+body {
+    @extend .bg-mattGray;
+    @extend .text-mattGray;
+}
+
+.wrapper {
+    margin-top: rem($margin-top);
+    .sideMenu {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        margin: rem($margin-top) auto auto;
+        width: rem(200px);
+        //border: 1px solid red;
+        transition: all ease $easeTime;
+        transform: translateX(-100%);//sideMenuを見えなくする
+        z-index: 2000;//一番上に表示
+    }
+    .content {
+        width: 100%;
+        margin-left: rem(0px);
+        transition: all ease $easeTime;
+    }
+    &.active {
+        .sideMenu {
+            transform: translateX(0);
+        }
+    }
+}
+/*ディスクトップサイズ*/
+@media(min-width: 992px) {
+    .wrapper {
+        /*展開されてない場合*/
+        .sideMenu {
+            transform: translateX(0);//表示させる
+        }
+        .content {
+            margin-left: rem(200px);//sideMenuの幅分必要
+        }
+        /*展開された場合*/
+        &.active {
+            .sideMenu {
+                width: rem(80px);
+                .nav-link {
+                    text-align: center;
+                    .icon {
+                        margin-right: 0;
+                    }
+                    .text {
+                        display: none;
+                    }
+                }
+            }
+            .content {
+                margin-left: rem(80px);//sideMenuの幅分必要
+            }
+        }
+    }
+}
+
+.nav-link {
+    display: block;
+    white-space: nowrap;
+    .icon {
+        margin-right: rem(4px);
+        font-size: rem(30px);
+        vertical-align: middle;
+        height: rem(32px);
+        width: rem(32px);
+        @extend .text-mattGray;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .text {
+        font-size: rem(14px);
+        @extend .text-mattGray;
+    }
+    &:hover,
+    &.active {
+        //@extend .bg-emerald-green;
+        .icon,
+        .text {
+            @extend .text-emerald-green;
+        }
+    }
+}

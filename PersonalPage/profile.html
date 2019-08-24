@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <button class="navbar-toggler sideMenuToggler" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Unisle</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Lorem
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="wrapper d-flex">
+        <div class="sideMenu bg-mattBlackLight">
+            <div class="sidevar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link px-2"><i class="zmdi zmdi-view-dashboard icon"></i><span
+                                class="text">Home</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="profile.html" class="nav-link px-2"><i class="zmdi zmdi-account icon"></i><span
+                                class="text">User
+                                Profile</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="member.html" class="nav-link px-2"><i class="zmdi zmdi-accounts-alt icon"></i><span
+                                class="text">Member</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link px-2"><i class="zmdi zmdi-chart icon"></i><span
+                                class="text">Charts</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link px-2"><i class="zmdi zmdi-devices icon"></i><span
+                                class="text">Slack</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link sideMenuToggler px-2"><i
+                                class="zmdi zmdi-format-list-bulleted icon"></i><span class="text">Resize</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link px-2"><i class="zmdi zmdi-settings icon"></i><span
+                                class="text">Settings</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="content">
+            <main>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 p-0">
+                            <div class="jumbotron text-light m-0"
+                                style="background:url(https://picsum.photos/2500/1000) center no-repeat; background-size: cover; height:300px;">
+                                <h1>Welcome to Unisle</h1>
+                                We support you doing your best
+                            </div>
+                        </div>
+                        <div class="col" style="margin-top:-120px;">
+                            <div id="AboutData">
+                                <div class="card bg-white">
+                                    <div class="card-title my-5">
+                                        <div class="media">
+                                            <img src="https://picsum.photos/250/250" width="250" height="250"
+                                                class="img-fluid rounded-top mx-5 d-none d-lg-block">
+                                            <div class="media-body">
+                                                <h3 class="display-4 text-dark ml-5">I'm Lorem, ipsum.</h3>
+                                                <p class="text-muted ml-5">University student</p>
+                                                <div class="container">
+                                                    <table class="table table-responsive ml-4">
+                                                        <tr>
+                                                            <td class="text-muted">Age</td>
+                                                            <td>:</td>
+                                                            <td>23 Years Old</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-muted">Email</td>
+                                                            <td>:</td>
+                                                            <td>Fun2000@example.com</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-muted">Website</td>
+                                                            <td>:</td>
+                                                            <td>www.example.com</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-muted">Phone</td>
+                                                            <td>:</td>
+                                                            <td>114-514-1919</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-dark">
+                                        <a href="#"><i class="zmdi zmdi-facebook zmdi-hc-2x mx-4 text-white"></i></a>
+                                        <a href="#"><i class="zmdi zmdi-github zmdi-hc-2x mx-4 text-white"></i></a>
+                                        <a href="#"><i
+                                                class="zmdi zmdi-instagram zmdi-hc-2x mx-4 text-white"></i></i></a>
+                                        <a href="#"><i class="zmdi zmdi-twitter zmdi-hc-2x mx-4 text-white"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
