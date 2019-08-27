@@ -76,7 +76,26 @@ boby {
     height: 250px;
     object-fit: cover;
     object-position: 50% 25%;
-    font-family: 'object-fit: cover; object-position: 50% 25%;'
+    transition-property: transform;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+    overflow: hidden;
+    font-family: 'object-fit: cover; object-position: 50% 25%;';
+}
+
+.activity-n1:hover {
+    transform: scale(1.1, 1.1);
+    cursor: pointer;
+}
+
+.activity-n2:hover {
+    transform: scale(1.1, 1.1);
+    cursor: pointer;
+}
+
+.activity-n3:hover {
+    transform: scale(1.1, 1.1);
+    cursor: pointer;
 }
 
 
@@ -87,7 +106,7 @@ boby {
     height: 250px;
     object-fit: cover;
     object-position: 50% 25%;
-    font-family: 'object-fit: cover; object-position: 50% 25%;'
+    font-family: 'object-fit: cover; object-position: 50% 25%;';
 }
 
 
@@ -99,5 +118,30 @@ boby {
     height: 100%;
     object-fit: cover;
     object-position: 50% 25%;
-    font-family: 'object-fit: cover; object-position: 50% 25%;'
+    overflow: hidden;
+    transition-property: transform;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+    font-family: 'object-fit: cover; object-position: 50% 25%;';
+}
+
+.link-n1:hover {
+    transform: scale(1.1, 1.1);
+    cursor: pointer;
+}
+
+.link-n2:hover {
+    transform: scale(1.1, 1.1);
+    cursor: pointer;
+}
+
+.link-n3:hover {
+    transform: scale(1.1, 1.1);
+    cursor: pointer;
+}
+
+.link-images {
+    /*width: 100%;
+    height: 100%;
+    overflow: hidden;*/
 }
