@@ -71,9 +71,90 @@ boby {
 
 /*Activety*/
 
+.activity-images {
+    text-align: center;
+}
+
+.activity-images img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    object-position: 50% 25%;
+    transition-property: transform;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+    overflow: hidden;
+    font-family: 'object-fit: cover; object-position: 50% 25%;';
+}
+
+.a-img-n1 div.a-text-n1 {
+    display: inline;
+    top: 70%;
+    font-size: 30;
+    font-weight: bold;
+    font-family: 'Chilanka', cursive;
+}
+
+.a-img-n2 div.a-text-n2 {
+    display: inline;
+    top: 70%;
+    font-size: 30;
+    font-weight: bold;
+    font-family: 'Chilanka', cursive;
+}
+
+.a-img-n3 div.a-text-n3 {
+    display: inline;
+    top: 70%;
+    font-size: 30;
+    font-weight: bold;
+    font-family: 'Chilanka', cursive;
+}
+
+.a-text-n1 {
+    display: inline;
+    position: absolute;
+    left: 30%;
+    top: calc(50% - 25px);
+    color: #6A5ACD;
+}
+
+.a-text-n2 {
+    display: inline;
+    position: absolute;
+    left: 30%;
+    top: calc(50% - 25px);
+    color: #6A5ACD;
+}
+
+.a-text-n3 {
+    display: inline;
+    position: absolute;
+    left: 30%;
+    top: calc(50% - 25px);
+    color: #6A5ACD;
+}
+
+.activity-n1:hover {
+    transform: scale(1.1, 1.1);
+    cursor: pointer;
+}
+
+.activity-n2:hover {
+    transform: scale(1.1, 1.1);
+    cursor: pointer;
+}
+
+.activity-n3:hover {
+    transform: scale(1.1, 1.1);
+    cursor: pointer;
+}
+
+
+/*一時的に無視
 #card-activity img {
     width: 100%;
-    height: 250px;
+    height: 300px;
     object-fit: cover;
     object-position: 50% 25%;
     transition-property: transform;
@@ -97,6 +178,11 @@ boby {
     transform: scale(1.1, 1.1);
     cursor: pointer;
 }
+
+.a-text {
+    position: absolute;
+}
+*/
 
 
 /*Leader*/
@@ -138,10 +224,4 @@ boby {
 .link-n3:hover {
     transform: scale(1.1, 1.1);
     cursor: pointer;
-}
-
-.link-images {
-    /*width: 100%;
-    height: 100%;
-    overflow: hidden;*/
 }
