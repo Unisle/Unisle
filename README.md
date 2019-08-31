@@ -62,6 +62,7 @@ e-mail：tankyuclub@gmail.com
 - #### 言語
     - HTML & CSS
     - Javascript
+    - JQuery
 
 - #### フレームワーク・ライブラリ・モジュール
     - [Firebase](https://firebase.google.com/?hl=ja)/Hosting,RealTimeDatabase,CloudFunction,Authentication
