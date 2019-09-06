@@ -236,3 +236,139 @@ boby {
     transform: scale(1.1, 1.1);
     cursor: pointer;
 }
+
+
+/*Content*/
+
+#Content {}
+
+.m-images {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.m-img-n1 img.m-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 25%;
+    font-family: 'object-fit: cover; object-position: 50% 25%;';
+}
+
+.m-img-n2 img.m-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 25%;
+    font-family: 'object-fit: cover; object-position: 50% 25%;';
+}
+
+.m-img-n3 img.m-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 25%;
+    font-family: 'object-fit: cover; object-position: 50% 25%;';
+}
+
+.m-img-n4 img.m-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 25%;
+    font-family: 'object-fit: cover; object-position: 50% 25%;';
+}
+
+.m-img-n5 img.m-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 25%;
+    font-family: 'object-fit: cover; object-position: 50% 25%;';
+}
+
+.m-item-n1 h2.m-text {
+    display: block;
+    text-align: center;
+    color: #000000;
+}
+
+.m-item-n1 h2.m-text span.role {
+    display: block;
+    font-size: 14px;
+}
+
+.m-item-n1 h2.m-text span.name {
+    display: block;
+    font-size: 18px;
+}
+
+.m-item-n2 h2.m-text {
+    display: block;
+    text-align: center;
+    color: #000000;
+}
+
+.m-item-n2 h2.m-text span.role {
+    display: block;
+    font-size: 14px;
+}
+
+.m-item-n2 h2.m-text span.name {
+    display: block;
+    font-size: 18px;
+}
+
+.m-item-n3 h2.m-text {
+    display: block;
+    text-align: center;
+    color: #000000;
+}
+
+.m-item-n3 h2.m-text span.role {
+    display: block;
+    font-size: 14px;
+}
+
+.m-item-n3 h2.m-text span.name {
+    display: block;
+    font-size: 18px;
+}
+
+.m-item-n4 h2.m-text {
+    display: block;
+    text-align: center;
+    color: #000000;
+}
+
+.m-item-n4 h2.m-text span.role {
+    display: block;
+    font-size: 14px;
+}
+
+.m-item-n4 h2.m-text span.name {
+    display: block;
+    font-size: 18px;
+}
+
+.m-item-n5 h2.m-text {
+    display: block;
+    text-align: center;
+    color: #000000;
+}
+
+.m-item-n5 h2.m-text span.role {
+    display: block;
+    font-size: 14px;
+}
+
+.m-item-n5 h2.m-text span.name {
+    display: block;
+    font-size: 18px;
+}
