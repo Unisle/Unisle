@@ -188,34 +188,6 @@ boby {
           justify-content: space-between;
 }
 
-.auther-coin-item,
-.auther-coin-item-hover {
-  -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
-}
-
-@-webkit-keyframes r7 {
-  0% {
-    -webkit-transform: rotateY(0deg);
-            transform: rotateY(0deg);
-  }
-  100% {
-    -webkit-transform: rotateY(180deg);
-            transform: rotateY(180deg);
-  }
-}
-
-@keyframes r7 {
-  0% {
-    -webkit-transform: rotateY(0deg);
-            transform: rotateY(0deg);
-  }
-  100% {
-    -webkit-transform: rotateY(180deg);
-            transform: rotateY(180deg);
-  }
-}
-
 .m-images img {
   width: 200px;
   height: 200px;
@@ -227,8 +199,14 @@ boby {
   font-family: 'object-fit: cover; object-position: 50% 25%;';
 }
 
+.auther-coin-item,
+.auther-coin-item-hover {
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+}
+
 .auther-coin-item-inner {
-  position: relative;
+  /*position: absolute;*/
   -webkit-transform-style: preserve-3d;
           transform-style: preserve-3d;
   -webkit-transition: -webkit-transform 0.25s ease;
@@ -237,18 +215,20 @@ boby {
   transition: transform 0.25s ease, -webkit-transform 0.25s ease;
 }
 
-.auther-coin-item {
+.auther-coin-item-inner .auther-coin-item {
   /*transform: translate3d(0, 0, 2px);*/
-  -webkit-transition: opacity .25s;
-  transition: opacity .25s;
-  opacity: 1.0s;
+  -webkit-transition: opacity .25s, -webkit-transform .25s;
+  transition: opacity .25s, -webkit-transform .25s;
+  transition: opacity .25s, transform .25s;
+  transition: opacity .25s, transform .25s, -webkit-transform .25s;
+  opacity: 1.0;
+  /*&:hover {
+             transform: rotateY(180deg);
+            opacity: 0;
+        }*/
 }
 
-.auther-coin-item:hover {
-  opacity: 0;
-}
-
-.auther-coin-item-hover {
+.auther-coin-item-inner .auther-coin-item-hover {
   position: absolute;
   top: 0;
   left: 0;
@@ -260,32 +240,42 @@ boby {
   transition: opacity 0.25s ease, -webkit-transform .25s ease;
   transition: transform .25s ease, opacity 0.25s ease;
   transition: transform .25s ease, opacity 0.25s ease, -webkit-transform .25s ease;
+  /*&:hover {
+            animation: r7 1s linear 1.0;
+            opacity: 1.0;
+            animation: r7 .25s linear 1.0;
+            transform: rotateY(180deg);
+            opacity: 1.0;
+            transform: translate3d(0, 0, 1px) rotateY(180deg);
+            transition: opacity 0.25s, transform 0.25s;
+        }*/
 }
 
-.auther-coin-item-hover:hover {
-  /*animation: r7 1s linear 1.0;*/
-  /*opacity: 1.0;*/
-  /*animation: r7 .25s linear 1.0;*/
-  opacity: 1.0;
-  /*transform: translate3d(0, 0, 1px) rotateY(180deg);*/
-  /*transition: opacity 0.25s, transform 0.25s;*/
-}
-
-.auther-text-name {
+.auther-coin-item-inner .auther-text-name {
   display: block;
   text-align: center;
   color: #000000;
 }
 
-.auther-text-name span {
+.auther-coin-item-inner .auther-text-name span {
   display: block;
 }
 
-.auther-text-name span.role {
+.auther-coin-item-inner .auther-text-name span.role {
   font-size: 14px;
 }
 
-.auther-text-name span.name {
+.auther-coin-item-inner .auther-text-name span.name {
   font-size: 18px;
+}
+
+.auther-coin-item-inner:hover > .auther-coin-item {
+  -webkit-transform: rotateY(180deg);
+          transform: rotateY(180deg);
+  opacity: 0;
+}
+
+.auther-coin-item-inner:hover > .auther-coin-item-hover {
+  opacity: 1.0;
 }
 /*# sourceMappingURL=style.css.map */
