@@ -65,31 +65,90 @@ boby {
 }
 
 /*Overview*/
-/*Features*/
-.f-item-n1,
-.f-item-n2,
-.f-item-n3 {
-  cursor: pointer;
-  -o-object-fit: cover;
-     object-fit: cover;
-  font-family: "object-fit:cover;";
+#overview {
+  margin: 25px 0;
 }
 
-.f-text-n1,
-.f-text-n2,
-.f-text-n3 {
-  position: absolute;
-  color: white;
-  top: 60%;
-  left: 70%;
+#overview .circle-introduction {
+  /*block消えてる*/
+  display: block;
+  margin: auto;
+}
+
+#overview .circle-introduction span {
+  display: block;
+}
+
+#overview .circle-introduction span.circle-name {
+  font-family: 'Georgia ';
+}
+
+#overview .circle-introduction span.sub {
+  font-family: 'Great Vibes', cursive;
+}
+
+#overview img {
+  /*float: right;*/
+}
+
+/*Features*/
+#features {
+  margin: 20px 0;
+  /*.f-item-n1,
+       .f-item-n2,
+       .f-item-n3 {
+           cursor: pointer;
+           object-fit: cover;
+           font-family: "object-fit:cover;";
+       }
+       .f-text-n1,
+       .f-text-n2,
+       .f-text-n3 {
+           position: absolute;
+           color: white;
+           top: 60%;
+           left: 70%;
+       }
+       */
+}
+
+#features .features-concept {
+  margin: 10px;
+  /*padding: 50px;*/
+  display: block;
+}
+
+#features .features-concept .features-image {
+  display: inline-block;
+}
+
+#features .features-concept .introduction {
+  display: inline-block;
+  vertical-align: middle;
+  /*margin: 0 100px;*/
+  /*position: relative;*/
+}
+
+#features .features-concept .introduction .sub-text {
+  display: block;
+  width: 500px;
+  /*position: absolute;
+               top: 50%;
+               left: 50%;
+               transform: translateY(-50%) translateX(-50%);*/
+  /*font-size: $sub-text-size;*/
 }
 
 /*Activety*/
-.activity-images {
+#activity {
+  margin: 25px 0;
+}
+
+#activity .activity-images {
   text-align: center;
 }
 
-.activity-images img {
+#activity .activity-images img {
   width: 100%;
   height: 300px;
   -o-object-fit: cover;
@@ -108,9 +167,9 @@ boby {
   font-family: 'object-fit: cover; object-position: 50% 25%;';
 }
 
-.a-img-n1 div.a-text-n1,
-.a-img-n2 div.a-text-n2,
-.a-img-n3 div.a-text-n3 {
+#activity .a-img-n1 div.a-text-n1,
+#activity .a-img-n2 div.a-text-n2,
+#activity .a-img-n3 div.a-text-n3 {
   display: inline;
   top: 70%;
   font-size: 30;
@@ -118,9 +177,9 @@ boby {
   font-family: 'Chilanka', cursive;
 }
 
-.a-text-n1,
-.a-text-n2,
-.a-text-n3 {
+#activity .a-text-n1,
+#activity .a-text-n2,
+#activity .a-text-n3 {
   display: inline;
   position: absolute;
   left: 30%;
@@ -128,16 +187,20 @@ boby {
   color: #6A5ACD;
 }
 
-.activity-n1:hover,
-.activity-n2:hover,
-.activity-n3:hover {
+#activity .activity-n1:hover,
+#activity .activity-n2:hover,
+#activity .activity-n3:hover {
   -webkit-transform: scale(1.1, 1.1);
           transform: scale(1.1, 1.1);
   cursor: pointer;
 }
 
 /*Leader*/
-#card-leader img {
+#leader {
+  margin: 25px 0;
+}
+
+#leader #card-leader img {
   width: 100%;
   height: 250px;
   -o-object-fit: cover;
@@ -148,7 +211,11 @@ boby {
 }
 
 /*Link*/
-#img-link img {
+#link {
+  margin: 20px 0;
+}
+
+#link #img-link img {
   border-radius: 50%;
   width: 100%;
   height: 100%;
@@ -168,16 +235,20 @@ boby {
   font-family: 'object-fit: cover; object-position: 50% 25%;';
 }
 
-.link-n1:hover,
-.link-n2:hover,
-.link-n3:hover {
+#link .link-n1:hover,
+#link .link-n2:hover,
+#link .link-n3:hover {
   -webkit-transform: scale(1.1, 1.1);
           transform: scale(1.1, 1.1);
   cursor: pointer;
 }
 
 /*Content*/
-.m-images {
+#Member {
+  margin: 25px 0;
+}
+
+#Member .m-images {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -188,7 +259,7 @@ boby {
           justify-content: space-between;
 }
 
-.m-images img {
+#Member .m-images img {
   width: 200px;
   height: 200px;
   border-radius: 50%;
@@ -199,13 +270,13 @@ boby {
   font-family: 'object-fit: cover; object-position: 50% 25%;';
 }
 
-.auther-coin-item,
-.auther-coin-item-hover {
+#Member .auther-coin-item,
+#Member .auther-coin-item-hover {
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
 }
 
-.auther-coin-item-inner {
+#Member .auther-coin-item-inner {
   /*position: absolute;*/
   -webkit-transform-style: preserve-3d;
           transform-style: preserve-3d;
@@ -215,7 +286,7 @@ boby {
   transition: transform 0.25s ease, -webkit-transform 0.25s ease;
 }
 
-.auther-coin-item-inner .auther-coin-item {
+#Member .auther-coin-item-inner .auther-coin-item {
   /*transform: translate3d(0, 0, 2px);*/
   -webkit-transition: opacity .25s, -webkit-transform .25s;
   transition: opacity .25s, -webkit-transform .25s;
@@ -228,7 +299,7 @@ boby {
         }*/
 }
 
-.auther-coin-item-inner .auther-coin-item-hover {
+#Member .auther-coin-item-inner .auther-coin-item-hover {
   position: absolute;
   top: 0;
   left: 0;
@@ -251,31 +322,31 @@ boby {
         }*/
 }
 
-.auther-coin-item-inner .auther-text-name {
+#Member .auther-coin-item-inner .auther-text-name {
   display: block;
   text-align: center;
   color: #000000;
 }
 
-.auther-coin-item-inner .auther-text-name span {
+#Member .auther-coin-item-inner .auther-text-name span {
   display: block;
 }
 
-.auther-coin-item-inner .auther-text-name span.role {
+#Member .auther-coin-item-inner .auther-text-name span.role {
   font-size: 14px;
 }
 
-.auther-coin-item-inner .auther-text-name span.name {
+#Member .auther-coin-item-inner .auther-text-name span.name {
   font-size: 18px;
 }
 
-.auther-coin-item-inner:hover > .auther-coin-item {
+#Member .auther-coin-item-inner:hover > .auther-coin-item {
   -webkit-transform: rotateY(180deg);
           transform: rotateY(180deg);
   opacity: 0;
 }
 
-.auther-coin-item-inner:hover > .auther-coin-item-hover {
+#Member .auther-coin-item-inner:hover > .auther-coin-item-hover {
   opacity: 1.0;
 }
 /*# sourceMappingURL=style.css.map */
