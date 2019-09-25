@@ -10,7 +10,9 @@
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/schedule.css">
+    <link rel="stylesheet" href="css/graph.css">
 </head>
 
 <body>
@@ -96,35 +98,231 @@
                         </div>
                         <div class="col-md-4 mt-3">
                             <div class="bg-primary p-3">
-                                <h4 class="mb-2">New Clients</h4>
+                                <a data-toggle="modal" data-target="#ModalAttendance">
+                                    <h4 class="mb-2">Attendance</h4>
+                                </a>
                                 <div class="progress" style="height: 16px">
                                     <div class="progress-bar bg-warning text-mattBlackDark" role="progressbar"
                                         style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
                                         25
                                     </div>
                                 </div>
+                                <div class="modal fade" id="ModalAttendance" tabindex="-1" role="dialog"
+                                    aria-labelledby="Modal" aria-hidden="true">
+                                    <!--以下modal-dialogのCSSの部分で modal-lgやmodal-smを追加するとモーダルのサイズを変更することができる-->
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content text-muted">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="Modal">出席確認</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="閉じる">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                キーを入力して出席確認を行ってください。
+                                            </div>
+                                            <form class="p-3">
+                                                <div class="form-group row">
+                                                    <label for="inputPassword"
+                                                        class="col-sm-2 col-form-label">Password</label>
+                                                    <div class="col-sm-10">
+                                                        <input type="password" class="form-control" id="inputPassword"
+                                                            placeholder="Password">
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">閉じる</button>
+                                                <button type="button" class="btn btn-primary">確認する</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4 mt-3">
                             <div class="bg-danger p-3">
-                                <h4 class="mb-2">New Projects</h4>
+                                <a data-toggle="modal" data-target="#ModalProject1">
+                                    <h4 class="mb-2">My Project1</h4>
+                                </a>
                                 <div class="progress" style="height: 16px">
                                     <div class="progress-bar bg-info text-mattBlackDark" role="progressbar"
                                         style="width: 50%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
                                         50
                                     </div>
                                 </div>
+                                <div class="modal fade" id="ModalProject1" tabindex="-1" role="dialog"
+                                    aria-labelledby="Modal" aria-hidden="true">
+                                    <!--以下modal-dialogのCSSの部分で modal-lgやmodal-smを追加するとモーダルのサイズを変更することができる-->
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content text-muted">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="Modal">進捗報告</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="閉じる">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                進捗情報を数字や言葉で示してください。どれか一つでも構いません。
+                                            </div>
+                                            <form class="p-3">
+                                                <div class="form-group row">
+                                                    <label for="inputPassword"
+                                                        class="col-sm-2 col-form-label">達成率</label>
+                                                    <div class="col-sm-10">
+                                                        <input type="password" class="form-control" id="inputPassword"
+                                                            placeholder="Number">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="inputPassword"
+                                                        class="col-sm-2 col-form-label">コメント</label>
+                                                    <div class="col-sm-10">
+                                                        <textarea class="form-control" id="exampleFormControlTextarea1"
+                                                            rows="3"></textarea>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">閉じる</button>
+                                                <button type="button" class="btn btn-primary">反映させる</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4 mt-3">
                             <div class="bg-mattBlackLight p-3">
-                                <h4 class="mb-2">Completed</h4>
+                                <a data-toggle="modal" data-target="#ModalProject1">
+                                    <h4 class="mb-2">My Project2</h4>
+                                </a>
                                 <div class="progress" style="height: 16px">
                                     <div class="progress-bar bg-success text-mattBlackDark" role="progressbar"
                                         style="width: 80%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
                                         80
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <div class="schedule bg-light text-muted border mt-3 p-3">
+                                <h6>Schedule</h6>
+                                <span class="date">
+                                    21 Jul, 2019
+                                </span>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <span class="job-type">OT</span>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <span class="location">Online Travel & Ticketing Site</span>
+                                        <span class="position">Senior UI/UX Developer</span>
+                                        <span class="time">08:00 AM</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span class="job-type">OS</span>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <span class="location">Online Schopping ecommerce</span>
+                                        <span class="position">Senior Developer</span>
+                                        <span class="time">09:30 AM</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <div class="bg-light text-muted border mt-3 pt-3">
+                                <a data-toggle="modal" data-target="#ModalGallaery">
+                                    <h6 class="ml-3 mb-1">Gallaery</h6>
+                                </a>
+                                <p class="ml-4 mb-0">Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                                    Temporibus, incidunt?</p>
+                                <div id="example-2" class="carousel slide my-3" data-ride="carousel">
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item active">
+                                            <img src="https://picsum.photos/400/200" alt="First slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img src="https://picsum.photos/500/200" alt="Second slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img src="https://picsum.photos/600/200" alt="Third slide">
+                                        </div>
+                                        <a class="carousel-control-prev" href="#example-2" role="button"
+                                            data-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="sr-only">Previous</span>
+                                        </a>
+                                        <a class="carousel-control-next" href="#example-2" role="button"
+                                            data-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="sr-only">Next</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <!-- モーダル -->
+                                <div class="modal fade" id="ModalGallaery" tabindex="-1" role="dialog"
+                                    aria-labelledby="Modal" aria-hidden="true">
+                                    <!--以下modal-dialogのCSSの部分で modal-lgやmodal-smを追加するとモーダルのサイズを変更することができる-->
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content text-muted">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="Modal">アルバム</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="閉じる">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                サークル活動またはバーベキューなどのイベントの際にとられた画像等を掲載
+                                            </div>
+                                            <div class="container-fluid">
+                                                <div class="row">
+                                                    <div class="col-6 p-3">
+                                                        <img class="img-fluid img-thumbnail"
+                                                            src="https://picsum.photos/400/300" alt="First slide">
+                                                    </div>
+                                                    <div class="col-6 p-3">
+                                                        <img class="img-fluid img-thumbnail"
+                                                            src="https://picsum.photos/400/300" alt="First slide">
+                                                    </div>
+                                                    <div class="col-6 p-3">
+                                                        <img class="img-fluid img-thumbnail"
+                                                            src="https://picsum.photos/400/300" alt="First slide">
+                                                    </div>
+                                                    <div class="col-6 p-3">
+                                                        <img class="img-fluid img-thumbnail"
+                                                            src="https://picsum.photos/400/300" alt="First slide">
+                                                    </div>
+                                                    <div class="col-6 p-3">
+                                                        <img class="img-fluid img-thumbnail"
+                                                            src="https://picsum.photos/400/300" alt="First slide">
+                                                    </div>
+                                                    <div class="col-6 p-3">
+                                                        <img class="img-fluid img-thumbnail"
+                                                            src="https://picsum.photos/400/300" alt="First slide">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">閉じる</button>
+                                                <button type="button" class="btn btn-primary">反映させる</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <div class="bg-light text-muted border mt-3 pt-3">
+                                <h6 class="ml-3 mb-1">Club expenses</h6>
+                                <canvas id="chart" height="360" width="500"></canvas>                                
                             </div>
                         </div>
                         <div class="col-12">
@@ -184,7 +382,9 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.js"></script>
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+    <script src="js/graph.js"></script>
 </body>
 
 </html>
